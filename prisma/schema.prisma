@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+//now what data do i need in my model, here it is the db
+//i dont think i need atransaction id
+
+//we aswell need the User model
+//user to register by either email and phone number
+//model User {
+//  id             String       @id @default(uuid()) @map("_id")
+//  email          String  
+//  phoneno        String?
+//}
+
+model User {
+  id        String   @id @default(uuid()) @map("_id")
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+
+model OnRamp {
+  id             String       @id @default(uuid()) @map("_id")
+  walletadress   String     //coz its just a string, but we must declare it as rqd
+  txnhash        String     //the hash  proves everything
+  amountCharged  String   //amount to be charged from the end user
+  isComplete     Boolean      @default(false) //whether transaction is complete or not
+  createdAt      DateTime     @default(now())
+}
+
+
+//now the Offramp table
+model OffRamp {
+  id             String       @id @default(uuid()) @map("_id")
+  phoneno        String       //when we are offramping we send money to your phone no
+  txnhash        String     //the hash  proves everything
+  amountPaid     String      //amount to be disbursed
+  isComplete     Boolean      @default(false) //whether transaction is complete or not
+  createdAt      DateTime     @default(now())
+}
+
