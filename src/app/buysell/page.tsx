@@ -1,11 +1,14 @@
 
 
 'use client'; // Mark this as a Client Component
-import React, { useState } from 'react';
-import { connect, disconnect } from 'starknetkit'; // Import starknetkit
+import React, { useState,Suspense, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
+import { WalletConnectButton } from '@/components/WalletConnectButton';
+import { useAccount, useBalance, useStarkProfile } from '@starknet-react/core';
 
-
+  ``
 export default function BuySell() {
   const [isBuyMode, setIsBuyMode] = useState(true); // Toggle between Buy and Sell
   const [youPay, setYouPay] = useState('39,522'); // Amount to pay
@@ -60,19 +63,34 @@ export default function BuySell() {
   //telling the user to connect their wallet
   const handleNextButtonClick = async () => {
     if (isBuyMode) {
-      try {
-        //prompt the user to connect their Argentx wallet
-        const wallet = await connect({
-          wallet: 'argentx', //specify the wallet you want to connect to 
-          network: 'mainnet', //specify the network (mainnet, testnet, etc)
-        });
-      }
+      
     }
   }
 
+  // Redirect logic
+  const router = useRouter(); // Hook for navigation
+
+  
+  //checking if the wallet has been connected successfully
+  const {address, isConnected, chainId} = useAccount();
+  //things like balance aswell here
+
+  const { data: balance } = useBalance({
+    address: address,
+  })
+
+  //const {data} = useStarkProfile(chainId)
+
+  useEffect(() => {
+    if (isConnected){
+      //redirect to the phone verify component if the wallet is connected
+      router.push('/phoneverify');
+    }
+  }, [isConnected, router]);
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-3/5 max-w-xl">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-xl">
         {/* Toggle Switch */}
         <div className="flex justify-center mb-4">
           <button
@@ -200,7 +218,9 @@ export default function BuySell() {
               </svg>
             </button>
             {isNetworkDropdownOpen && (
-              <div className="absolute z-10 mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200">
+              <div className="absolute z-10 mt-2 w-full bg-white rounded-lg 
+                shadow-lg border border-gray-200"
+              >
                 <button
                   onClick={() => handleNetworkSelect('Starknet')}
                   className="w-full p-2 text-left text-gray-900 hover:bg-gray-100 rounded-lg"
@@ -238,10 +258,15 @@ export default function BuySell() {
           </div>
         </div>
 
-        {/* Next Button */}
-        <button className="w-full bg-green-500 text-white py-2 rounded-lg font-semibold hover:bg-green-600 transition duration-300">
-          {isBuyMode ? 'Next: Specify your wallet' : 'Next: Verify your phone'}
-        </button>
+        {/* Next Button*/}
+        {isBuyMode ? (
+          <WalletConnectButton /> 
+        )  : ( <button className="w-full bg-green-500 text-white py-2 rounded-lg
+               font-semibold hover:bg-green-600 transition duration-300">
+            Next: Verify your phone
+          </button>
+        )}
+        
       </div>
     </div>
   );

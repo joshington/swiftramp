@@ -1,18 +1,16 @@
-import Navbar from "@/components/Navbar";
-import Image from "next/image";
-import { prisma } from "@/utils/prisma";
-import Hero from "@/components/Hero";
-import Features from "@/components/Features";
-import Footer from "@/components/Footer";
+
+"use client"
+
+import Dapp from "@/components/Dapp"
+import { StarknetProvider } from "@/components/starknet-provider"
 
 
 export default function Home() {
   return (
-    <div>
-      <Navbar />
-      <Hero />
-      <Features />
-      <Footer />
+    <div className="flex flex-col h-screen">
+      <StarknetProvider>
+          <Dapp />
+      </StarknetProvider>
     </div>
   )
 }

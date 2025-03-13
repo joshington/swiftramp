@@ -7,16 +7,19 @@ import Navbar from  "../../components/Navbar"
 import Footer from '../../components/Footer';
 
 export default function Dashboard() {
-    const { data: session } = useSession();
+    //const { data: session } = useSession();
 
-    if (!session) {
-        redirect('/signin');
-    }
+    //if (!session) {
+    //    redirect('/signin');
+    //}
 
     return (
         <div>
             <h1>Dashboard</h1>
-            <p>Welcome, {session.user?.email}!</p>
+            {/*
+                <p>Welcome, {session.user?.email}!</p>
+            */}
+            
         </div>
     );
 }

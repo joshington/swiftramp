@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const Navbar: React.FC = () => {
-  const { data: session } = useSession();
+  //const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
 
   //==addin the router here =====
@@ -69,7 +69,14 @@ const Navbar: React.FC = () => {
 
           {/* Call-to-Action Button */}
           <div className="hidden md:flex items-center space-x-1">
-            {session ? (
+              <Link
+                href="/buysell"
+                className="py-2 px-4 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition duration-300"
+              >
+                Get Started
+              </Link>
+            {/*
+                {session ? (
               <>
                 <Link
                   href="/dashboard"
@@ -95,6 +102,8 @@ const Navbar: React.FC = () => {
                 </Link>
               </>
             )}
+            */}
+            
             
           </div>
 
