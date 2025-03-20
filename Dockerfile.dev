@@ -28,7 +28,7 @@ WORKDIR  /app
 #RUN npm i -g pnpm 
 
 
-#Copy node_modules, package.json, and other ncecessary files from the base image
+#Copy node_modules, package.json, and other necessary files from the base image
 COPY --from=base /app/node_modules ./node_modules 
 COPY --from=base /app/package.json  ./package.json
 COPY --from=base /app/.next  ./.next

@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
   experimental: {
     
   },
+  env: {
+    PESAPAL_CONSUMER_KEY: process.env.PESAPAL_CONSUMER_KEY,
+    PESAPAL_CALLBACK_URL: process.env.PESAPAL_CALLBACK_URL,
+  }
 };
 
 export default nextConfig;
