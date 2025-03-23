@@ -13,7 +13,17 @@ const nextConfig: NextConfig = {
   env: {
     PESAPAL_CONSUMER_KEY: process.env.PESAPAL_CONSUMER_KEY,
     PESAPAL_CALLBACK_URL: process.env.PESAPAL_CALLBACK_URL,
-  }
+  },
+  // Disable source maps in development
+  productionBrowserSourceMaps: false,
+  async rewrites() {
+    return [
+      {
+        source: '/api/pesapal/:path*',
+        destination: 'https://cybqa.pesapal.com/pesapalv3/api/Auth/:path*',
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -83,10 +83,14 @@ export default function BuySell() {
 
   useEffect(() => {
     if (isConnected){
-      //redirect to the phone verify component if the wallet is connected
-      router.push('/phoneverify');
+      const queryParams = new URLSearchParams({
+        isBuyMode:isBuyMode.toString(), //since i have to send the mode to the next page
+        amount: youPay.replace(/,/g, ''), //remove the commas for the amount
+        //get the carrier and network aswell 
+      }).toString();
+      router.push(`/phoneverify?${queryParams}`);
     }
-  }, [isConnected, router]);
+  }, [isConnected,isConnected,isBuyMode,youPay, router]);
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
