@@ -3,33 +3,21 @@
 //use the access token to initiate a payment request
 //create a function to submit a payment request
 
-import axios from "axios";
+import fetch from 'node-fetch';
 import { getPesaPalAccessToken } from "./pesapalAuth";
 
-{/*
-    
-    export const submitPesaPalPayment = async (paymentData: any) => {
-        const accessToken = await getPesaPalAccessToken();
-        const submitUrl = 
-            process.env.PESAPAL_ENVIRONMENT === 'sandbox'
-                ? 'https://cybqa.pesapal.com/pesapalv3/api/Transactions/SubmitOrderRequest'
-                : ' https://pay.pesapal.com/v3/api/Transactions/SubmitOrderRequest'
 
-        const response = await axios.post(submitUrl, paymentData, {
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-                Authorization: `Bearer ${accessToken}`,
-            },
-        });
-
-        return response.data;
-    };
-    
-*/}
 
 export const submitPesaPalPayment = async (paymentData: any) => {
-    const accessToken = await getPesaPalAccessToken();
+    const fetch = require('node-fetch');
+    const accessObject = await getPesaPalAccessToken();
+    const accessToken = accessObject.token;
+
+
+    
+
+
+    // Determine the submit URL based on the environment
     const submitUrl = 
         process.env.PESAPAL_ENVIRONMENT === 'sandbox'
             ? 'https://cybqa.pesapal.com/pesapalv3/api/Transactions/SubmitOrderRequest'
@@ -37,18 +25,29 @@ export const submitPesaPalPayment = async (paymentData: any) => {
     //the above gets the access token
    
     try {
-        const response = await axios.post(submitUrl, paymentData, {
+        // Make the POST request using fetch
+        const response = await fetch(submitUrl, {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json',
+                Accept: 'application/json',
                 Authorization: `Bearer ${accessToken}`,
             },
+            body: JSON.stringify(paymentData), // Convert paymentData to JSON
         });
-        //return the response data
-        return response.data;
+        // Check if the response is OK (status code 2xx)
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        // Parse the JSON response
+        const responseData = await response.json();
+
+        // Return the response data
+        return responseData;
     } catch (error) {
-        console.error('Error making payment request:', error);
-        throw new Error('Failed to make payment request');
+        console.log('Error making payment request:', error);
+        console.log('Failed to make payment request');
     }
 
 }

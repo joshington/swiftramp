@@ -31,14 +31,16 @@
     },
     "strictNullChecks": true
   },
-  "include": ["src/**/*", "next.config.ts"],
-  
+  "include": [
+    "next.config.ts",
+    "src/**/*",
+    ".next/types/**/*.ts"
+  ],
   //"include": [
   //  "next-env.d.ts",
   //  "**/*.ts",
   //  "**/*.tsx",
   //  ".next/types/**/*.ts",
-    
   //],
   "exclude": [
     "node_modules"
