@@ -53,19 +53,6 @@ describe('initiateTransfer', () => {
         )
         
         
-        {/*
-            expect(fetch).toHaveBeenCalledWith(
-            'https://api.flutterwave.com/v3/transfers',
-            {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: 'Bearer test_secret_key',
-                },
-                body: JSON.stringify(mockTransferDetails),
-            }
-        );
-        */}
         
     });
     it('should handle API errors', async () => {
@@ -87,13 +74,5 @@ describe('initiateTransfer', () => {
         expect(result.message).toContain('Transfer failed');
     });
 
-    {/*
-            it('should handle network errors', async () => {
-            (fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
-            const result = await initiateTransfer(mockTransferDetails);
-            expect(result.status).toBe('error');
-            expect(result.error).toBe('Network error');
-        });
-    */}
     
 })
