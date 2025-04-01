@@ -106,8 +106,9 @@ const Hero: React.FC = () => {
           <div className="lg:w-3/5 lg:pr-8 mb-10 lg:mb-0">
             <div className="text-left">
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-                Swiftly Buy and Sell <br />
-                <span className="text-green-500">Crypto Instantly</span>
+              <span className='text-[#25BA88]'>Swiftly </span>
+                 Buy and Sell Crypto
+                <span className="text-[#25BA88]"> Instantly</span>
               </h1>
 
               <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-8">
@@ -148,25 +149,20 @@ const Hero: React.FC = () => {
 
           {/* Right side - Buy/Sell component (reduced width) */}
           <div className="lg:w-3/5 bg-white rounded-xl shadow-lg p-5">
-            <div className="flex justify-between items-center mb-5">
-              <h3 className="text-lg font-semibold text-gray-900">
-                You are currently: <span className="text-green-500">{isBuying ? 'Buying' : 'Selling'}</span>
-              </h3>
-              <div className="flex space-x-2">
+          <div className="flex justify-center items-center mb-5">
                 <button 
                   onClick={() => setIsBuying(true)}
-                  className={`px-3 py-1 rounded-md text-sm ${isBuying ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-700'}`}
+                  className={`px-3 py-1 rounded-md text-sm ${isBuying ? 'bg-[#25BA88] text-white' : 'bg-gray-100 text-gray-700'}`}
                 >
-                  Buy
+                  Buy Crypto
                 </button>
                 <button 
                   onClick={() => setIsBuying(false)}
-                  className={`px-3 py-1 rounded-md text-sm ${!isBuying ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-700'}`}
+                  className={`px-3 py-1 rounded-md text-sm ${!isBuying ? 'bg-[#25BA88] text-white' : 'bg-gray-100 text-gray-700'}`}
                 >
-                  Sell
+                  Sell Crypto
                 </button>
               </div>
-            </div>
 
             {/* allow user to select the network */}
             <div className="mb-5">
@@ -254,6 +250,12 @@ const Hero: React.FC = () => {
                   </div>
                 </div>
               )}
+
+              <div className="flex justify-between items-center mb-5">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  You are currently: <span className="text-[#25BA88]">{isBuying ? 'Buying' : 'Selling'}</span>
+                </h3>
+              </div>
 
               {/* Exchange Rate and Currency Inputs */}
               <div className="pt-2">
@@ -351,6 +353,12 @@ const Hero: React.FC = () => {
                 </div>
 
                 <div className="flex space-x-3">
+                <button 
+                    className="flex items-center justify-center px-3 py-2 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition duration-300 text-sm"
+                    title="Schedule Order"
+                  >
+                    <FiCalendar className="text-base text-[#25BA88]" />
+                  </button>
                 
                 <Link
                   href={isFormComplete ? "/checkout" : "#"}
@@ -370,15 +378,6 @@ const Hero: React.FC = () => {
                 >
                   Proceed Order
                 </Link>
-                  
-                  
-                  
-                  <button 
-                    className="flex items-center justify-center px-3 py-2 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition duration-300 text-sm"
-                    title="Schedule Order"
-                  >
-                    <FiCalendar className="text-base text-green-500" />
-                  </button>
                 </div>
               </div>
             </div>

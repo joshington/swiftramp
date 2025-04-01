@@ -15,11 +15,9 @@ const Navbar: React.FC = () => {
   const router = useRouter();
 
   return (
-    <nav className="bg-gray-900 shadow-lg">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex justify-between">
-          {/* Logo */}
-          <div className="flex items-center">
+    <nav className="bg-[#191E29] shadow-lg">
+      <div className="max-w-6xl mx-auto px-4 flex items-center justify-between">
+        {/* Logo */}
             <a href="#" className="flex items-center py-6 px-2">
               <img
                 src="/slogo.png" // Path to your logo file in the public folder
@@ -27,21 +25,40 @@ const Navbar: React.FC = () => {
                 className="h-8 w-auto" // Adjust height and width as needed
               />
             </a>
-          </div>
+        <div className="flex justify-end">
 
           {/* Primary Navbar Items */}
           <div className="hidden md:flex items-center space-x-1">
-            <Link href="/" className="py-4 px-2 text-gray-500 font-semibold hover:text-green-500 transition duration-300">
+            <Link href="/" className="py-4 px-2 text-gray-500 font-semibold hover:text-[#25BA88] transition duration-300">
               Home
             </Link>
-            <a href="#" className="py-4 px-2 text-gray-500 font-semibold hover:text-green-500 transition duration-300">
-              Buy Crypto
-            </a>
-            <a href="#" className="py-4 px-2 text-gray-500 font-semibold hover:text-green-500 transition duration-300">
-              Sell Crypto
-            </a>
+
             <div className="relative group">
-              <button className="py-4 px-2 text-gray-500 font-semibold hover:text-green-500 transition duration-300 flex items-center">
+              <button className="py-4 px-2 text-gray-500 font-semibold hover:text-[#25BA88] transition duration-300 flex items-center">
+                <span>Buy Crypto</span>
+                <svg
+                  className="w-4 h-4 ml-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div className="absolute hidden group-hover:block bg-white shadow-lg rounded-lg mt-2 py-2 w-48">
+                <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-500">
+                  Sell Crypto
+                </a>
+              </div>
+            </div>
+
+            <a href="#" className="py-4 px-2 text-gray-500 font-semibold hover:text-[#25BA88] transition duration-300">
+              Crypto
+            </a>
+
+            <div className="relative group">
+              <button className="py-4 px-2 text-gray-500 font-semibold hover:text-[#25BA88] transition duration-300 flex items-center">
                 <span>More</span>
                 <svg
                   className="w-4 h-4 ml-1"
@@ -70,10 +87,16 @@ const Navbar: React.FC = () => {
           {/* Call-to-Action Button */}
           <div className="hidden md:flex items-center space-x-1">
               <Link
-                href="/buysell"
-                className="py-2 px-4 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition duration-300"
+                href="#"
+                className="py-2 px-4 bg-[#25BA88] text-white font-semibold rounded-lg hover:bg-[#0B9567] transition duration-300"
               >
-                Get Started
+                Sign In
+              </Link>
+              <Link
+                href="#"
+                className="py-2 px-4 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:text-gray transition duration-300"
+              >
+                Register
               </Link>
             {/*
                 {session ? (
