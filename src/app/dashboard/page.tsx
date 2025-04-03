@@ -94,9 +94,9 @@ const Dashboard = () => {
             <div className="flex items-center ">
               <button 
                 onClick={() => setMenuOpen(!menuOpen)}
-                className="md:hidden mr-4 text-gray-300"
+                className=" text-white"
               >
-                <FiMenu size={20} />
+                <FiMenu size={31} />
               </button>
               <h1 className="text-xl font-bold text-white">Hide Menu</h1>
             </div>

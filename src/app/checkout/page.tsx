@@ -5,6 +5,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { FiArrowLeft } from 'react-icons/fi';
 
+import Receipt from '@/components/Receipt';
+
 const CheckoutPage: React.FC = () => {
   const [userName, setUserName] = useState('');
 
@@ -33,8 +35,10 @@ const CheckoutPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
+    
+    
+    <div className="flex flex-col md:flex-row gap-6 items-center justify-center  w-full mt-9">
+      <div className="w-full md:w-1/3 bg-white rounded-lg shadow-md p-6">
         {/* Header */}
         <div className="p-6">
           <div className="flex items-center mb-6">
@@ -158,12 +162,20 @@ const CheckoutPage: React.FC = () => {
 
           {/* Pay Now Button */}
           <button
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150"
+            className="w-full bg-green-600 
+              hover:bg-green-700 text-white font-bold py-3 px-4 
+              rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 
+              focus:ring-offset-2 transition duration-150"
           >
             Pay Now
           </button>
         </div>
       </div>
+      <div className="w-full md:w-1/2 bg-white rounded-lg shadow-md p-6">
+          <Receipt />
+      </div>
+
+  
     </div>
   );
 };

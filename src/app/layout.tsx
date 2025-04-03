@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth"
 
 
 
-import Providers from "./Providers";
+
 
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -56,9 +56,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <StarknetProvider>
-          {children}
-        </StarknetProvider>
+        
+          <StarknetProvider>
+            {children}
+          </StarknetProvider>
+        
+        
       </body>
     </html>
   );
