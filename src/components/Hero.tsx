@@ -89,7 +89,7 @@ const Hero: React.FC = () => {
     'Uganda': ['MTN Uganda', 'Airtel Uganda'],
     'Kenya': ['Safaricom', 'Airtel Kenya'],
     'Tanzania': ['Vodacom', 'Airtel Tanzania'],
-    'Sudan': ['Zain Sudan', 'MTN Sudan'],
+    'Sudan': ['MTN Sudan', 'Zain Sudan'],
     'Rwanda': ['MTN Rwanda', 'Airtel Rwanda']
   };
 
@@ -120,6 +120,7 @@ const Hero: React.FC = () => {
   const handleLocalAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setUgxAmount(value);
+
     if (value && !isNaN(Number(value))) {
       const rate = exchangeRates[getCurrencySymbol(selectedCountry) as keyof typeof exchangeRates];
 
@@ -144,12 +145,12 @@ const Hero: React.FC = () => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-[#191E29] to-[#25BA88] py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="bg-gradient-to-r from-[#191E29] to-[#25BA88] py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
         <div className="flex flex-col lg:flex-row items-center">
           {/* Left side - Text content */}
-          <div className="lg:w-3/5 lg:pr-8 mb-10 lg:mb-0">
-            <div className="text-left">
+          <div className="lg:w-4/5 lg:pr-8 mb-10 lg:mb-0">
+            <div className=" text-center lg:text-left">
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
               <span className='text-[#25BA88]'>Swiftly </span>
                  Buy and Sell Crypto
@@ -160,7 +161,7 @@ const Hero: React.FC = () => {
                 Join the world's fastest-growing crypto exchange. Start trading in minutes.
               </p>
 
-              <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+              <div className="flex flex-col sm:flex-row justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
                 <Link
                   href="/buysell"
                   className="bg-[#25BA88] text-white px-6 py-3 rounded-lg font-semibold text-lg hover:bg-green-600 transition duration-300 text-center"
@@ -193,7 +194,7 @@ const Hero: React.FC = () => {
           </div>
 
           {/* Right side - Buy/Sell component (reduced width) */}
-          <div className="lg:w-3/5 bg-white rounded-xl p-12">
+          <div className="lg:w-3/5 bg-white rounded-xl p-12 scale-85">
           <div className="flex justify-center items-center mb-5">
                 <button 
                   onClick={() => setIsBuying(true)}
@@ -285,18 +286,21 @@ const Hero: React.FC = () => {
                 </div>
               )}
 
-              <div className="flex justify-between items-center mb-5">
+              <div className="mb-5">
                 <h3 className="text-lg font-semibold text-gray-900">
                   You are currently: <span className="text-[#25BA88]">{isBuying ? 'Buying' : 'Selling'}</span>
                 </h3>
-                <div className="flex justify-start items-center mb-2">
-                <img src="/stocks.svg" alt="Exchange Rate Icon"/>
+
+                {bnbAmount && !isNaN(Number(bnbAmount)) && (
+                <div className="flex items-center gap-1 mt-2">
+                <img src="/stocks.svg" alt="Exchange Rate Icon" className='w-4 h-4'/>
                   <span className="text-xs font-medium text-[#25BA88]">
                     1 USDC = {
                       exchangeRates[getCurrencySymbol(selectedCountry) as 
                         keyof typeof exchangeRates].toLocaleString()} {getCurrencySymbol(selectedCountry)}
                   </span>
                 </div>
+                )}
               </div>
 
               {/* Exchange Rate and Currency Inputs */}
@@ -316,11 +320,10 @@ const Hero: React.FC = () => {
                                   focus:ring-[#25BA88] focus:border-[#25BA88] text-black text-sm`}
                       placeholder={isBuying ? "0-" : "0+"} 
                     />
-                    {!isLocalInputFocused && ugxAmount === '' && (
                       <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         {CurrencyIcons[getCurrencySymbol(selectedCountry) as keyof typeof CurrencyIcons]()}
                       </div>
-                    )}
+                    
                     
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                       <span className="text-gray-500 text-sm">
@@ -352,7 +355,7 @@ const Hero: React.FC = () => {
                     <input
                       type="text"
                       value={bnbAmount}
-                      onChange={(e) => setBnbAmount(e.target.value)}
+                      onChange={handleBnbAmountChange}
                       className="w-2/3 py-2 px-3 bg-[#F4F4F4] text-black text-sm text-right
                                 focus:outline-none focus:ring-green-500"
                       placeholder={isBuying ? "+0" : "-0"}
@@ -365,17 +368,17 @@ const Hero: React.FC = () => {
 
                 <div className="flex space-x-3">
                 <button 
-                    className="flex items-center justify-center px-6 py-5 border border-[#25BA88] rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition duration-300 text-sm"
+                    className="flex items-center justify-center px-6 py-5 border-2 border-[#25BA88] rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition duration-300 text-sm"
                     title="Schedule Order"
                   >
-                    <FiCalendar className="text-base text-[#25BA88]" />
+                    <FiCalendar className="text-base text-[#25BA88] scale-150" />
                   </button>
                 
                 <Link
                   href={isFormComplete ? "/checkout" : "#"}
                   passHref
-                  className={`w-full py-2 rounded-lg font-semibold 
-                    transition duration-300 flex items-center justify-center text-sm ${
+                  className={`w-full py-2 rounded-lg font-semibold
+                    transition duration-300 flex items-center justify-center text-lg ${
                     isFormComplete 
                       ? 'bg-[#25BA88] text-white hover:bg-[#0B9567]' 
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'

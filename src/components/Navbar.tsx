@@ -20,7 +20,7 @@ const Navbar: React.FC = () => {
         {/* Logo */}
             <a href="#" className="flex items-center py-6 px-2">
               <img
-                src="/slogo.png" // Path to your logo file in the public folder
+                src="/Logo/Swift Ramp (Light version).png" // Path to your logo file in the public folder
                 alt="swift Logo"
                 className="h-8 w-auto" // Adjust height and width as needed
               />
@@ -29,7 +29,7 @@ const Navbar: React.FC = () => {
 
           {/* Primary Navbar Items */}
           <div className="hidden md:flex items-center space-x-1">
-            <Link href="/" className="py-4 px-2 text-gray-500 font-semibold hover:text-[#25BA88] transition duration-300">
+            <Link href="/" className="py-4 px-2 text-[#25BA88] font-semibold"> {/* Placeholder until we implement NavLink */}
               Home
             </Link>
 
@@ -85,16 +85,16 @@ const Navbar: React.FC = () => {
           </div>
 
           {/* Call-to-Action Button */}
-          <div className="hidden md:flex items-center space-x-1">
+          <div className="hidden md:flex ml-10 items-center space-x-4">
               <Link
                 href="#"
-                className="py-2 px-4 bg-[#25BA88] text-white font-semibold rounded-lg hover:bg-[#0B9567] transition duration-300"
+                className="py-2 px-4 bg-[#25BA88] text-white font-medium rounded-lg hover:bg-[#0B9567] transition duration-300"
               >
                 Sign In
               </Link>
               <Link
                 href="#"
-                className="py-2 px-4 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:text-gray transition duration-300"
+                className="py-2 px-4 bg-transparent border-2 border-white text-white font-medium rounded-lg hover:text-gray transition duration-300"
               >
                 Register
               </Link>
