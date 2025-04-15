@@ -9,7 +9,7 @@ const Hero: React.FC = () => {
   const [isBuying, setIsBuying] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState('');
   const [mobileCarrier, setMobileCarrier] = useState('');
-  const [selectedCountry, setSelectedCountry] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState('Uganda');
   const [ugxAmount, setUgxAmount] = useState('');
   const [bnbAmount, setBnbAmount] = useState('');
   const [isFormComplete, setIsFormComplete] = useState(false);
@@ -213,11 +213,12 @@ const Hero: React.FC = () => {
             <div className="space-y-5">
               {/* Country Selector Dropdown */}
               <div>
+              <h3 className="text-lg font-medium text-gray-700 mb-2">Select a Country</h3>
                 <select
                   id="country"
-                  defaultValue=""
+                  defaultValue={selectedCountry}
                   onChange={(e) => setSelectedCountry(e.target.value)}
-                  className="block w-full px-4 py-4 text-base text-gray-900 bg-white border-2 border-[#25BA88] 
+                  className="block w-full px-4 py-4 text-base text-gray-700 bg-white border-2 border-[#25BA88] 
                             rounded-lg focus:ring-[#25BA88] focus:border-[#25BA88] 
                             focus:outline-none"
                 >

@@ -2,8 +2,9 @@
 
 // src/components/Navbar.tsx
 import { useSession, signOut } from 'next-auth/react';
-import React, { useState } from "react";
+import React, { Children, useState } from "react";
 import { useRouter } from "next/navigation";
+import { usePathname } from 'next/navigation';
 
 import Link from "next/link";
 
@@ -13,6 +14,25 @@ const Navbar: React.FC = () => {
 
   //==addin the router here =====
   const router = useRouter();
+
+  const NavElements = ({href, children}: {href: string; children: React.ReactNode}) => {
+    const pathname = usePathname();
+    const isActive = pathname === href;
+
+    return(
+      <Link
+      href ={href}
+      className={`
+        py-4 px-2 font-semibold transition duration-200 rounded-b-md
+        ${isActive 
+          ? 'text-[#25BA88] group-hover/nav:text-gray-500 group-hover/nav:border-gray-500' 
+          : 'text-gray-500 hover:text-[#25BA88]'}
+      `}
+      >
+        {children}
+      </Link>
+    )
+  }
 
   return (
     <nav className="bg-[#191E29] shadow-lg">
@@ -28,10 +48,8 @@ const Navbar: React.FC = () => {
         <div className="flex justify-end">
 
           {/* Primary Navbar Items */}
-          <div className="hidden md:flex items-center space-x-1">
-            <Link href="/" className="py-4 px-2 text-[#25BA88] font-semibold"> {/* Placeholder until we implement NavLink */}
-              Home
-            </Link>
+          <div className="hidden md:flex items-center space-x-1 group/nav">
+            <NavElements href="/">Home</NavElements>
 
             <div className="relative group">
               <button className="py-4 px-2 text-gray-500 font-semibold hover:text-[#25BA88] transition duration-300 flex items-center">
@@ -47,15 +65,13 @@ const Navbar: React.FC = () => {
                 </svg>
               </button>
               <div className="absolute hidden group-hover:block bg-white shadow-lg rounded-lg mt-2 py-2 w-48">
-                <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-500">
+                <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-500">
                   Sell Crypto
-                </a>
+                </Link>
               </div>
             </div>
 
-            <a href="#" className="py-4 px-2 text-gray-500 font-semibold hover:text-[#25BA88] transition duration-300">
-              Crypto
-            </a>
+            <NavElements href="#">Crypto</NavElements>
 
             <div className="relative group">
               <button className="py-4 px-2 text-gray-500 font-semibold hover:text-[#25BA88] transition duration-300 flex items-center">
@@ -71,15 +87,15 @@ const Navbar: React.FC = () => {
                 </svg>
               </button>
               <div className="absolute hidden group-hover:block bg-white shadow-lg rounded-lg mt-2 py-2 w-48">
-                <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-500">
+                <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-500">
                   About Us
-                </a>
-                <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-500">
+                </Link>
+                <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-500">
                   Blog
-                </a>
-                <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-500">
+                </Link>
+                <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-500">
                   Contact
-                </a>
+                </Link>
               </div>
             </div>
           </div>
