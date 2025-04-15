@@ -22,7 +22,7 @@ const Navbar: React.FC = () => {
               <img
                 src="/Logo/Swift Ramp (Light version).png" // Path to your logo file in the public folder
                 alt="swift Logo"
-                className="h-8 w-auto" // Adjust height and width as needed
+                className="h-11 w-auto" // Adjust height and width as needed
               />
             </a>
         <div className="flex justify-end">
