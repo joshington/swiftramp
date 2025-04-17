@@ -9,7 +9,8 @@ import { connectors } from "@/connectors";
 import { 
     publicProvider, 
     StarknetConfig, 
-    argent,braavos,
+    braavos,
+    argent,
     useInjectedConnectors,
     voyager
 } from "@starknet-react/core";

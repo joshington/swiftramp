@@ -3,9 +3,9 @@
 'use client'
 import { Provider } from "react-redux";
 import {store} from "./lib/store";
-import {persistStore} from "redux-persist";
+//import {persistStore} from "redux-persist";
 
-persistStore(store);
+//persistStore(store);
 //we are persisting the store here
 
 

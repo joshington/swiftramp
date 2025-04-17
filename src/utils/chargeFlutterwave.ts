@@ -57,6 +57,7 @@ export const chargeWithFlutterwave = async (
                 type: 'mobile_money_uganda',
             }),
         };
+        console.log('======fetching flutterwave--------')
         const response = await fetch(
             'https://api.flutterwave.com/v3/charges',
             options

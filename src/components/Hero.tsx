@@ -5,6 +5,11 @@ import React, { useState, useEffect } from 'react';
 import Link from "next/link";
 import { FiCalendar, FiChevronDown} from 'react-icons/fi';
 
+//go ahead and import useSelector
+import { useAppDispatch } from '../app/lib/store';
+import { InitiateOrder } from '../app/actions/orderActions';
+import { OrderType } from '../app/actions/actionTypes';
+
 const Hero: React.FC = () => {
   const [isBuying, setIsBuying] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState('');
@@ -97,6 +102,10 @@ const Hero: React.FC = () => {
       setUgxAmount('');
     }
   };
+
+
+  //===now declare the dispatch const here ===
+  const dispatch = useAppDispatch();
 
   return (
     <div className="bg-gradient-to-r from-green-50 to-white py-20">
@@ -365,7 +374,27 @@ const Hero: React.FC = () => {
                   onClick={(e) => {
                     if (!isFormComplete) {
                       e.preventDefault();
+                      return;
                     }
+
+                    //create the order payload
+                    const orderPayload = {
+                      type: isBuying ? OrderType.BUY : OrderType.SELL,
+                      asset: {
+                        symbol: 'USDC',
+                        name: selectedNetwork === 'Starknet' ? 'USDC(Starknet)' :
+                              selectedNetwork === 'Lisk' ? 'USDC(Lisk)' : 
+                              selectedNetwork === 'Celo' ? 'USDC(CELO)' : 'USDC',
+                        amount:parseFloat(bnbAmount || '0'),
+                        network: selectedNetwork
+                      },
+                      amount: parseFloat(ugxAmount || '0'),
+                      country:selectedCountry,
+                      paymthd: paymentMethod
+                    };
+                    
+                    //dispatch the action now
+                    dispatch(InitiateOrder(orderPayload));
                   }}
                 >
                   Proceed Order
