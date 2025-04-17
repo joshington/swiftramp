@@ -2,8 +2,9 @@
 
 // src/components/Navbar.tsx
 import { useSession, signOut } from 'next-auth/react';
-import React, { useState } from "react";
+import React, { Children, useState } from "react";
 import { useRouter } from "next/navigation";
+import { usePathname } from 'next/navigation';
 
 import Link from "next/link";
 
@@ -14,34 +15,66 @@ const Navbar: React.FC = () => {
   //==addin the router here =====
   const router = useRouter();
 
+  const NavElements = ({href, children}: {href: string; children: React.ReactNode}) => {
+    const pathname = usePathname();
+    const isActive = pathname === href;
+
+    return(
+      <Link
+      href ={href}
+      className={`
+        py-4 px-2 font-semibold transition duration-200 rounded-b-md
+        ${isActive 
+          ? 'text-[#25BA88] group-hover/nav:text-gray-500 group-hover/nav:border-gray-500' 
+          : 'text-gray-500 hover:text-[#25BA88]'}
+      `}
+      >
+        {children}
+      </Link>
+    )
+  }
+
   return (
-    <nav className="bg-gray-900 shadow-lg">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex justify-between">
-          {/* Logo */}
-          <div className="flex items-center">
+    <nav className="bg-[#191E29] shadow-lg">
+      <div className="max-w-6xl mx-auto px-4 flex items-center justify-between">
+        {/* Logo */}
             <a href="#" className="flex items-center py-6 px-2">
               <img
-                src="/slogo.png" // Path to your logo file in the public folder
+                src="/Logo/Swift Ramp (Light version).png" // Path to your logo file in the public folder
                 alt="swift Logo"
-                className="h-8 w-auto" // Adjust height and width as needed
+                className="h-11 w-auto" // Adjust height and width as needed
               />
             </a>
-          </div>
+        <div className="flex justify-end">
 
           {/* Primary Navbar Items */}
-          <div className="hidden md:flex items-center space-x-1">
-            <Link href="/" className="py-4 px-2 text-gray-500 font-semibold hover:text-green-500 transition duration-300">
-              Home
-            </Link>
-            <a href="#" className="py-4 px-2 text-gray-500 font-semibold hover:text-green-500 transition duration-300">
-              Buy Crypto
-            </a>
-            <a href="#" className="py-4 px-2 text-gray-500 font-semibold hover:text-green-500 transition duration-300">
-              Sell Crypto
-            </a>
+          <div className="hidden md:flex items-center space-x-1 group/nav">
+            <NavElements href="/">Home</NavElements>
+
             <div className="relative group">
-              <button className="py-4 px-2 text-gray-500 font-semibold hover:text-green-500 transition duration-300 flex items-center">
+              <button className="py-4 px-2 text-gray-500 font-semibold hover:text-[#25BA88] transition duration-300 flex items-center">
+                <span>Buy Crypto</span>
+                <svg
+                  className="w-4 h-4 ml-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div className="absolute hidden group-hover:block bg-white shadow-lg rounded-lg mt-2 py-2 w-48">
+                <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-500">
+                  Sell Crypto
+                </Link>
+              </div>
+            </div>
+
+            <NavElements href="#">Crypto</NavElements>
+
+            <div className="relative group">
+              <button className="py-4 px-2 text-gray-500 font-semibold hover:text-[#25BA88] transition duration-300 flex items-center">
                 <span>More</span>
                 <svg
                   className="w-4 h-4 ml-1"
@@ -54,26 +87,32 @@ const Navbar: React.FC = () => {
                 </svg>
               </button>
               <div className="absolute hidden group-hover:block bg-white shadow-lg rounded-lg mt-2 py-2 w-48">
-                <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-500">
+                <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-500">
                   About Us
-                </a>
-                <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-500">
+                </Link>
+                <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-500">
                   Blog
-                </a>
-                <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-500">
+                </Link>
+                <Link href="#" className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-500">
                   Contact
-                </a>
+                </Link>
               </div>
             </div>
           </div>
 
           {/* Call-to-Action Button */}
-          <div className="hidden md:flex items-center space-x-1">
+          <div className="hidden md:flex ml-10 items-center space-x-4">
               <Link
-                href="/buysell"
-                className="py-2 px-4 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition duration-300"
+                href="#"
+                className="py-2 px-4 bg-[#25BA88] text-white font-medium rounded-lg hover:bg-[#0B9567] transition duration-300"
               >
-                Get Started
+                Sign In
+              </Link>
+              <Link
+                href="#"
+                className="py-2 px-4 bg-transparent border-2 border-white text-white font-medium rounded-lg hover:text-gray transition duration-300"
+              >
+                Register
               </Link>
             {/*
                 {session ? (
