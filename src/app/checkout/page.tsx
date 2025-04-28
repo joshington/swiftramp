@@ -170,6 +170,7 @@ const CheckoutPage: React.FC = () => {
         const paymentResponse = await chargeWithFlutterwave(payload);
         if(paymentResponse.status === 'success') {
           //we are supposed to get the payment link actually
+          paymentResponse.data
         }
         if (paymentResponse.status === 'error') {
           throw new Error(paymentResponse.error || 'Payment failed');
@@ -307,9 +308,9 @@ const CheckoutPage: React.FC = () => {
           <Receipt />
       </div>
       <div className="w-full md:w-1/3 bg-white rounded-lg shadow-md p-6">
-        {/* Header */}
+       {/* Header */}
         <div className="p-6">
-          <div className="flex items-center mb-6">
+          <div className="items-center mb-6">
             <Link href="/" className="mr-2">
               <FiArrowLeft className="text-gray-600" size={20} />
             </Link>
