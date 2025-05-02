@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth"
 
 
 
+
 import Providers from "./Providers";
 
 import { Geist, Geist_Mono } from "next/font/google";
@@ -15,6 +16,7 @@ import Footer from "@/components/Footer";
 
 
 import { StarknetProvider } from "@/components/starknet-provider";
+import { StoreProvider } from "./store/StoreProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,12 +56,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body>
-        <StarknetProvider>
-          {children}
-        </StarknetProvider>
-      </body>
-    </html>
+    <StoreProvider>
+      <html lang="en">
+        <body>
+          <StarknetProvider>
+            {children}
+          </StarknetProvider>
+        </body>
+      </html>
+    </StoreProvider>
   );
 }

@@ -1,18 +1,34 @@
-
-
-// src/components/Hero.tsx
+//src/components/Hero.tsx
 import React, { useState, useEffect } from 'react';
 import Link from "next/link";
 import { FiCalendar, FiChevronDown} from 'react-icons/fi';
 
+import { useDispatch, useSelector } from 'react-redux';
+import { setSelectedCountry,
+  setLocalCurrencyInput,
+  setCryptoCurrencyOutput,
+  setPaymentMethod,
+  setMobileCarrier
+ } from '@/app/store/checkoutForumSlice';
+
+ 
 const Hero: React.FC = () => {
+  const dispatch = useDispatch();
+  const selectedCountry = useSelector((state: any) => state.checkoutForum.selectedCountry);
+  const ugxAmount = useSelector((state: any) => state.checkoutForum.localCurrencyInput);
+  const bnbAmount = useSelector((state: any) => state.checkoutForum.cryptoCurrencyOutput);
+  const paymentMethod = useSelector((state: any) => state.checkoutForum.paymentMethod);
+  const mobileCarrier = useSelector((state: any) => state.checkoutForum.mobileCarrier);
+
   const [isBuying, setIsBuying] = useState(true);
-  const [paymentMethod, setPaymentMethod] = useState('');
+  const [isFormComplete, setIsFormComplete] = useState(false);
+  
+  /*const [paymentMethod, setPaymentMethod] = useState('');
   const [mobileCarrier, setMobileCarrier] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('Uganda');
   const [ugxAmount, setUgxAmount] = useState('');
-  const [bnbAmount, setBnbAmount] = useState('');
-  const [isFormComplete, setIsFormComplete] = useState(false);
+  const [bnbAmount, setBnbAmount] = useState('');*/
+
 
 
   const [isLocalInputFocused, setIsLocalInputFocused] = useState(false);
@@ -119,28 +135,28 @@ const Hero: React.FC = () => {
 
   const handleLocalAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setUgxAmount(value);
+    dispatch(setLocalCurrencyInput(value));
 
     if (value && !isNaN(Number(value))) {
       const rate = exchangeRates[getCurrencySymbol(selectedCountry) as keyof typeof exchangeRates];
 
       const bnbValue = (Number(value) / rate).toFixed(6);
-      setBnbAmount(bnbValue);
+      dispatch(setCryptoCurrencyOutput(bnbValue));
     } else {
-      setBnbAmount('');
+      dispatch(setCryptoCurrencyOutput(''));
     }
   };
 
   const handleBnbAmountChange = (e:React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setBnbAmount(value);
+    dispatch(setCryptoCurrencyOutput(value));
 
     if(value && !isNaN(Number(value))) {
       const rate = exchangeRates[getCurrencySymbol(selectedCountry) as keyof typeof exchangeRates];
       const localValue = (Number(value) * rate).toFixed(2);
-      setUgxAmount(localValue);
+      dispatch(setLocalCurrencyInput(localValue));
     } else {
-      setUgxAmount('');
+      dispatch(setLocalCurrencyInput(''));
     }
   };
 
@@ -217,7 +233,7 @@ const Hero: React.FC = () => {
                 <select
                   id="country"
                   defaultValue={selectedCountry}
-                  onChange={(e) => setSelectedCountry(e.target.value)}
+                  onChange={(e) => dispatch(setSelectedCountry(e.target.value))}
                   className="block w-full px-4 py-4 text-base text-gray-700 bg-white border-2 border-[#25BA88] 
                             rounded-lg focus:ring-[#25BA88] focus:border-[#25BA88] 
                             focus:outline-none"
@@ -243,7 +259,7 @@ const Hero: React.FC = () => {
                       name="paymentMethod"
                       value="Mobile Money"
                       checked={paymentMethod === 'Mobile Money'}
-                      onChange={() => setPaymentMethod('Mobile Money')}
+                      onChange={() => dispatch(setPaymentMethod('Mobile Money'))}
                       className="h-4 w-4 text-green-500 focus:ring-green-500 border-gray-300"
                     />
                     <span className="text-gray-700 text-sm">Mobile Money</span>
@@ -254,7 +270,7 @@ const Hero: React.FC = () => {
                       name="paymentMethod"
                       value="Credit Card"
                       checked={paymentMethod === 'Credit Card'}
-                      onChange={() => setPaymentMethod('Credit Card')}
+                      onChange={() => dispatch(setPaymentMethod('Credit Card'))}
                       className="h-4 w-4 text-green-500 focus:ring-green-500 border-gray-300"
                     />
                     <span className="text-gray-700 text-sm">Credit Card</span>
@@ -276,7 +292,7 @@ const Hero: React.FC = () => {
                           name="mobileCarrier"
                           value={carrier}
                           checked={mobileCarrier === carrier}
-                          onChange={() => setMobileCarrier(carrier)}
+                          onChange={() => dispatch(setMobileCarrier(carrier))}
                           className="h-4 w-4 text-green-500 focus:ring-green-500 border-gray-300"
                         />
                         <span className="text-gray-700 text-sm">{carrier}</span>
