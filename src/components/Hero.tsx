@@ -4,32 +4,25 @@ import Link from "next/link";
 import { FiCalendar, FiChevronDown} from 'react-icons/fi';
 
 import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/app/store/store';
 import { setSelectedCountry,
   setLocalCurrencyInput,
   setCryptoCurrencyOutput,
   setPaymentMethod,
-  setMobileCarrier
+  setMobileCarrier,
+  setCryptoExchangeState
  } from '@/app/store/checkoutForumSlice';
 
  
 const Hero: React.FC = () => {
   const dispatch = useDispatch();
-  const selectedCountry = useSelector((state: any) => state.checkoutForum.selectedCountry);
-  const ugxAmount = useSelector((state: any) => state.checkoutForum.localCurrencyInput);
-  const bnbAmount = useSelector((state: any) => state.checkoutForum.cryptoCurrencyOutput);
-  const paymentMethod = useSelector((state: any) => state.checkoutForum.paymentMethod);
-  const mobileCarrier = useSelector((state: any) => state.checkoutForum.mobileCarrier);
-
-  const [isBuying, setIsBuying] = useState(true);
+  const selectedCountry = useSelector((state: RootState) => state.checkoutForum.selectedCountry);
+  const ugxAmount = useSelector((state: RootState) => state.checkoutForum.localCurrencyInput);
+  const bnbAmount = useSelector((state: RootState) => state.checkoutForum.cryptoCurrencyOutput);
+  const paymentMethod = useSelector((state: RootState) => state.checkoutForum.paymentMethod);
+  const mobileCarrier = useSelector((state: RootState) => state.checkoutForum.mobileCarrier);
+  const CryptoExchangeState = useSelector((state: RootState) => state.checkoutForum.isBuying);
   const [isFormComplete, setIsFormComplete] = useState(false);
-  
-  /*const [paymentMethod, setPaymentMethod] = useState('');
-  const [mobileCarrier, setMobileCarrier] = useState('');
-  const [selectedCountry, setSelectedCountry] = useState('Uganda');
-  const [ugxAmount, setUgxAmount] = useState('');
-  const [bnbAmount, setBnbAmount] = useState('');*/
-
-
 
   const [isLocalInputFocused, setIsLocalInputFocused] = useState(false);
 
@@ -114,11 +107,15 @@ const Hero: React.FC = () => {
     if(paymentMethod !== 'Mobile Money'){
       setMobileCarrier('');
     } 
-    const requiredFieldsFilled = 
-      selectedCountry && 
-      paymentMethod && 
-      (paymentMethod !== 'Mobile Money' || mobileCarrier) && 
-      (parseFloat(ugxAmount) > 0|| parseFloat(bnbAmount) > 0);
+    const ugxNum = parseFloat(ugxAmount);
+    const bnbNum = parseFloat(bnbAmount);
+    
+    // Check if the selected country, payment method, and mobile carrier (if applicable) are filled
+    const requiredFieldsFilled =
+    selectedCountry &&
+    paymentMethod &&
+    (paymentMethod !== 'Mobile Money' || mobileCarrier) &&
+    (!isNaN(ugxNum) && ugxNum > 0 || !isNaN(bnbNum) && bnbNum > 0);
     setIsFormComplete(!!requiredFieldsFilled);
   }, [selectedCountry, paymentMethod, mobileCarrier, ugxAmount, bnbAmount]);
 
@@ -212,19 +209,27 @@ const Hero: React.FC = () => {
           {/* Right side - Buy/Sell component (reduced width) */}
           <div className="lg:w-3/5 bg-white rounded-xl p-12 scale-85">
           <div className="flex justify-center items-center mb-5">
-                <button 
-                  onClick={() => setIsBuying(true)}
-                  className={`px-8 py-1 rounded-l-full text-sm ${isBuying ? 'bg-[#25BA88] text-white' : 'bg-gray-100 text-gray-700'}`}
-                >
-                  Buy Crypto
-                </button>
-                <button 
-                  onClick={() => setIsBuying(false)}
-                  className={`px-8 py-1 rounded-r-full text-sm  ${!isBuying ? 'bg-[#25BA88] text-white' : 'bg-gray-100 text-gray-700'}`}
-                >
-                  Sell Crypto
-                </button>
-              </div>
+              <button 
+                onClick={() => {
+                  dispatch(setCryptoCurrencyOutput(''));
+                  dispatch(setLocalCurrencyInput(''));
+                  dispatch(setCryptoExchangeState(true));;
+                }}
+                className={`cursor-pointer px-8 py-1 rounded-l-full text-sm ${CryptoExchangeState ? 'bg-[#25BA88] text-white' : 'bg-gray-100 text-gray-700'}`}
+              >
+                Buy Crypto
+              </button>
+              <button 
+                onClick={() => {
+                  dispatch(setCryptoCurrencyOutput(''));
+                  dispatch(setLocalCurrencyInput(''));
+                  dispatch(setCryptoExchangeState(false));;
+                }}
+                className={`cursor-pointer px-8 py-1 rounded-r-full text-sm ${!CryptoExchangeState ? 'bg-[#25BA88] text-white' : 'bg-gray-100 text-gray-700'}`}
+              >
+                Sell Crypto
+              </button>
+            </div>
 
             <div className="space-y-5">
               {/* Country Selector Dropdown */}
@@ -305,7 +310,7 @@ const Hero: React.FC = () => {
 
               <div className="mb-5">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  You are currently: <span className="text-[#25BA88]">{isBuying ? 'Buying' : 'Selling'}</span>
+                  You are currently: <span className="text-[#25BA88]">{CryptoExchangeState ? 'Buying' : 'Selling'}</span>
                 </h3>
 
                 {bnbAmount && !isNaN(Number(bnbAmount)) && (
@@ -335,7 +340,7 @@ const Hero: React.FC = () => {
                                   ${isLocalInputFocused || ugxAmount !== '' ? 'pl-3' : 'pl-10'} pr-3 
                                   py-4 border border-[#F4F4F4] rounded-md focus:outline-none 
                                   focus:ring-[#25BA88] focus:border-[#25BA88] text-black text-sm`}
-                      placeholder={isBuying ? "0-" : "0+"} 
+                      placeholder={CryptoExchangeState ? "0-" : "0+"} 
                     />
                       <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         {CurrencyIcons[getCurrencySymbol(selectedCountry) as keyof typeof CurrencyIcons]()}
@@ -375,7 +380,7 @@ const Hero: React.FC = () => {
                       onChange={handleBnbAmountChange}
                       className="w-2/3 py-2 px-3 bg-[#F4F4F4] text-black text-sm text-right
                                 focus:outline-none focus:ring-green-500"
-                      placeholder={isBuying ? "+0" : "-0"}
+                      placeholder={CryptoExchangeState ? "+0" : "-0"}
                     />
                     <span className="text-gray-500 text-sm pr-3">
                       USDC

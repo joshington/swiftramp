@@ -6,6 +6,7 @@ interface CheckoutForumState {
   cryptoCurrencyOutput: string;
   paymentMethod: 'Mobile Money' | 'Credit Card' | '';
   mobileCarrier?: string;
+  isBuying: boolean;
 }
 
 const initialState: CheckoutForumState = {
@@ -14,6 +15,7 @@ const initialState: CheckoutForumState = {
     cryptoCurrencyOutput: '',
     paymentMethod: '',
     mobileCarrier: '',
+    isBuying: true
   };
 
 export const CheckoutForumSlice = createSlice({
@@ -35,6 +37,9 @@ export const CheckoutForumSlice = createSlice({
     setMobileCarrier: (state, action: PayloadAction<string | undefined>) => {
       state.mobileCarrier = action.payload;
     },
+    setCryptoExchangeState: (state, action: PayloadAction<boolean>) => {
+      state.isBuying = action.payload;
+    },
     resetForum: () => initialState
   }
 })
@@ -45,6 +50,7 @@ export const {
   setCryptoCurrencyOutput,
   setPaymentMethod,
   setMobileCarrier,
+  setCryptoExchangeState,
   resetForum
 } = CheckoutForumSlice.actions;
 

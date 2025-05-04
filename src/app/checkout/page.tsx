@@ -6,15 +6,23 @@ import Link from 'next/link';
 import { FiArrowLeft } from 'react-icons/fi';
 import { RootState } from '../store/store';
 import { useSelector } from 'react-redux';
+import TermsModal from '../../components/modal/termsmodal';
+import PhoneVerificationModal from '../../components/modal/PhoneVerificationModal';
 
 const CheckoutPage: React.FC = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [email, setEmail] = useState('');
   const [saveInfo, setSaveInfo] = useState(false);
   const [walletConnected, setWalletConnected] = useState(false);
+  const [selectedWallet, setSelectedWallet] = useState('');
+
+  const [showTerms, setShowTerms] = useState(false);
+  const [showPhoneVerification, setShowPhoneVerification] = useState(false);
 
   const selectedCountry = useSelector((state: RootState) => state.checkoutForum.selectedCountry);
   console.log("Selected country:", selectedCountry);
@@ -30,6 +38,16 @@ const CheckoutPage: React.FC = () => {
 
   const selectedMobileCarrier = useSelector((state: RootState) => state.checkoutForum.mobileCarrier);
   console.log("Selected Mobile Carrier:", selectedMobileCarrier);
+
+  const selectedCryptoExchangeState = useSelector((state: RootState) => state.checkoutForum.isBuying);
+  console.log("Selected Crypto Exchange State:", selectedCryptoExchangeState);
+
+  const getCryptoExchangeState = () => {
+    if (selectedCryptoExchangeState) {
+      return "Buying";
+    }
+    return "Selling";
+  }
 
   const carriersByCountry = {
     Uganda: ['MTN Uganda', 'Airtel Uganda'],
@@ -127,8 +145,7 @@ const CheckoutPage: React.FC = () => {
         </Link>
       </div>
 
-      <div className='flex flex-row'>
-
+      <div className='flex flex-row items-start'>
       {/* first div for the left side of the page*/}
         <div className="max-w-md mx-auto bg-white rounded-xl overflow-hidden md:max-w-2xl">
           {/* Header */}
@@ -171,7 +188,7 @@ const CheckoutPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div>
+              <div>
                 <input
                   type="email"
                   value={email}
@@ -182,45 +199,135 @@ const CheckoutPage: React.FC = () => {
                 />
               </div>
 
-              <div>  
-                <div className="flex space-x-2">
-                  <select className="w-2/3 px-3 py-4 border border-[#25BA88] text-gray-400 text-sm rounded-md mr-5 focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option>Select Wallet Address</option>
-                    <option>MetaMask</option>
-                    <option>Trust Wallet</option>
-                    <option>Coinbase Wallet</option>
-                  </select>
-
-                  <button
-                    onClick={handleConnectWallet}
-                    className={`w-1/3 px-4 py-2 rounded-md font-medium transition ${
-                      walletConnected 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-[#25BA88] text-white hover:bg-blue-700'
-                    }`}
-                  >
-                    {walletConnected ? 'Connected ✓' : 'Connect Wallet'}
-                  </button>
-                </div>
+              <div>
+                <input
+                  type="password"
+                  value={password}
+                  placeholder={"Password"}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-3 py-3 bg-[#F4F4F4] 
+                    rounded-md focus:outline-none focus:ring-2 focus:ring-[#25BA88] text-black"
+                />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone number</label>
-                <div className="flex">
-                <div className="w-1/4 px-3 py-2 bg-[#F4F4F4] 
-                    rounded-l-md bg-gray-100 flex items-center justify-center text-black">
-                    {phoneIcons[phoneSymbol as keyof typeof phoneIcons]?.()}
-                  </div>
-                  <input
-                    type="tel"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="w-3/4 px-3 py-3 bg-[#F4F4F4] rounded-r-md focus:outline-none 
-                      focus:ring-2 focus:ring-[#25BA88] text-black"
-                    placeholder="Phone number"
-                  />
-                </div>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  placeholder={"Confirm Password"}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-3 py-3 bg-[#F4F4F4] 
+                    rounded-md focus:outline-none focus:ring-2 focus:ring-[#25BA88] text-black"
+                />
               </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="termsAndConditions"
+                  className="h-4 w-4 text-green-600 focus:ring-[#25BA88] border-gray-300 rounded cursor-pointer"
+                />
+                 <label htmlFor="termsAndConditions" className="ml-2 block text-sm text-gray-700">
+                    I agree to the  
+                    <span 
+                      className="text-[#25BA88] underline cursor-pointer ml-1" 
+                      onClick={() => setShowTerms(true)}
+                    >
+                      terms and conditions
+                    </span>
+                  </label>
+                <TermsModal isOpen={showTerms} onClose={() => setShowTerms(false)} />
+              </div>
+
+              <hr className="my-4 h-px border-t-0 bg-[#E3E3E3]" />
+
+              {/* Payment Details Form */}
+
+              <div className="flex justify-center w-full">
+                <h2 className="text-xl font-semibold text-[#25BA88] mb-2">Payment Details</h2>
+              </div>
+
+              {selectedPaymentMethod === "Mobile Money" ? (
+                <div>
+                  <div className="flex space-x-2">
+                    <select
+                      className="w-2/3 px-3 py-4 border border-[#25BA88] text-gray-400 cursor-pointer text-sm rounded-md mr-5 focus:outline-none focus:ring-2 focus:ring-[#25BA88]"
+                      onChange={(e) => setSelectedWallet(e.target.value)}
+                    >
+                      <option value="">Select Wallet Address</option>
+                      <option value="MetaMask">MetaMask</option>
+                      <option value="Trust Wallet">Trust Wallet</option>
+                      <option value="Coinbase Wallet">Coinbase Wallet</option>
+                    </select>
+
+                    <button
+                      onClick={handleConnectWallet}
+                      disabled={!selectedWallet}
+                      className={`w-1/3 px-4 py-2 rounded-md font-medium transition ${
+                        walletConnected
+                          ? 'bg-green-100 text-green-800'
+                          : selectedWallet
+                          ? 'bg-[#25BA88] text-white hover:bg-[#0B9567] cursor-pointer'
+                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
+                    >
+                      {walletConnected ? 'Connected ✓' : 'Connect Wallet'}
+                    </button>
+                  </div>
+
+                  <div>
+                    <div className="flex py-4">
+                      <div
+                        className="w-1/4 px-3 py-2 bg-[#F4F4F4] rounded-l-md bg-gray-100 flex items-center justify-center text-black"
+                      >
+                        {phoneIcons[phoneSymbol as keyof typeof phoneIcons]?.()}
+                      </div>
+                      <input
+                        type="tel"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        className="w-3/4 px-3 py-3 bg-[#F4F4F4] rounded-r-md focus:outline-none focus:ring-2 focus:ring-[#25BA88] text-black"
+                        placeholder="Phone number"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : selectedPaymentMethod === "Credit Card" ? (
+                <div>
+                  <div className="space-y-4">
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Cardholder Name"
+                        className="w-full px-3 py-3 bg-[#F4F4F4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#25BA88] text-black"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Card Number"
+                        className="w-full px-3 py-3 bg-[#F4F4F4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#25BA88] text-black"
+                      />
+                    </div>
+                    <div className="flex space-x-4">
+                      <div className="w-1/2">
+                        <input
+                          type="text"
+                          placeholder="MM/YYYY"
+                          className="w-full px-3 py-3 bg-[#F4F4F4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#25BA88] text-black"
+                        />
+                      </div>
+                      <div className="w-1/2">
+                        <input
+                          type="text"
+                          placeholder="CVV"
+                          className="w-full px-3 py-3 bg-[#F4F4F4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#25BA88] text-black"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
 
               <div className="flex items-center">
                 <input
@@ -228,9 +335,9 @@ const CheckoutPage: React.FC = () => {
                   id="saveInfo"
                   checked={saveInfo}
                   onChange={(e) => setSaveInfo(e.target.checked)}
-                  className="h-4 w-4 text-green-600 focus:ring-[#25BA88] border-gray-300 rounded"
+                  className="h-4 w-4 text-green-600 cursor-pointer focus:ring-[#25BA88] border-gray-300 rounded"
                 />
-                <label htmlFor="saveInfo" className="ml-2 block text-sm text-gray-700">
+                <label htmlFor="saveInfo" className="ml-2 block cursor-pointer text-sm text-gray-700">
                   Save information for future exchange
                 </label>
               </div>
@@ -238,27 +345,51 @@ const CheckoutPage: React.FC = () => {
 
             {/* Pay Now Button */}
             <button
-              className="w-full bg-[#25BA88] hover:bg-green-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150"
+              onClick={() => {
+                if (selectedPaymentMethod === "Mobile Money") {
+                  setShowPhoneVerification(true);
+                  <div className="flex items-center">
+                    <PhoneVerificationModal isOpen={showPhoneVerification} onClose={() => setShowPhoneVerification(false)} />
+                  </div>
+                  } 
+              
+              else {
+                  console.log("Processing payment...");
+                }
+              }}
+              className="w-full bg-[#25BA88] hover:bg-[#0B9567] cursor-pointer text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150"
             >
               Pay Now
             </button>
+            <PhoneVerificationModal
+              isOpen={showPhoneVerification}
+              onClose={() => setShowPhoneVerification(false)}
+            />
           </div>
         </div>
                       
         {/* Second div for the right side of the page*/}
-        <div className="max-w-3xl mx-auto bg-white rounded-xl overflow-hidden">
-          {/* Header */}
+        <div className="max-w-3xl mx-auto bg-white rounded-xl overflow-hidden mt-4">
           <div className="p-6">
             <div className="flex justify-center w-full">
-              <h2 className="text-xl font-normal text-[#0C0C0D] mb-6">You are currently: Buying </h2>
+              <h2 className="text-xl font-semibold text-[#25BA88]">Order Summary</h2>
+            </div>
+          </div>
+
+          {/* Header */}
+          <div className="p-2">
+            <div className="flex justify-center w-full">
+              <h2 className="text-xl font-normal text-[#0C0C0D] mb-2">You are currently:
+                <span className="text-[#25BA88]"> {getCryptoExchangeState()}</span>
+              </h2>
             </div>
 
-              <div className="flex justify-center w-full">
-                <h3 className="text-xl font-normal text-[#0C0C0D] mb-6">
+            <div className="flex justify-center w-full">
+              <h3 className="text-xl font-normal text-[#0C0C0D] mb-6">
                 <span className="text-[#25BA88]">USDC</span>
                 <span className="text-[#0C0C0D] font-semibold"> {selectedCrypto ? `$${selectedCrypto}` : ': 0'}</span>
-                </h3>
-              </div>
+              </h3>
+            </div>
           </div>
 
           <div className="space-y-4 mb-8 w-full max-w-md">
@@ -267,7 +398,7 @@ const CheckoutPage: React.FC = () => {
               <select
                 value={selectedPaymentMethod || ''}
                 onChange={(e) => console.log(`Selected Payment Method: ${e.target.value}`)}
-                className="text-sm font-normal text-[#0C0C0D]  px-2 py-1 focus:outline-none"
+                className="text-sm font-normal text-[#0C0C0D] cursor-pointer px-2 py-1 focus:outline-none"
               >
                 <option value="" disabled>Select Payment Method</option>
                 <option value="Mobile Money">Mobile Money</option>
@@ -276,13 +407,14 @@ const CheckoutPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="space-y-4 mb-8">
-            <div className="flex justify-between items-center px-6">
+          {selectedPaymentMethod === "Mobile Money" && (
+            <div className="space-y-4 mb-8">
+              <div className="flex justify-between items-center px-6">
                 <p className="text-sm font-normal text-[#0C0C0D]">Mobile Carrier:</p>
                 <select
                   value={selectedMobileCarrier || ''}
-                  onChange={(e) => console.log(`Selected Payment Method: ${e.target.value}`)}
-                  className="text-sm font-normal text-[#0C0C0D]  px-2 py-1 focus:outline-none"
+                  onChange={(e) => console.log(`Selected Mobile Carrier: ${e.target.value}`)}
+                  className="text-sm font-normal text-[#0C0C0D] cursor-pointer px-2 py-1 focus:outline-none"
                 >
                   <option value="" disabled>Select Mobile Carrier</option>
                   {mobileCarriers.map((carrier) => (
@@ -291,8 +423,9 @@ const CheckoutPage: React.FC = () => {
                     </option>
                   ))}
                 </select>
+              </div>
             </div>
-          </div>
+          )}
 
           <hr className="my-4 h-px border-t-0 bg-[#E3E3E3]" />
 
@@ -305,8 +438,8 @@ const CheckoutPage: React.FC = () => {
 
           <div className="space-y-4 mb-8">
             <div className="flex justify-between items-center px-6">
-                <p className="text-sm font-normal text-[#0C0C0D]">Estimated Fee:</p>
-                <p className="text-sm font-normal text-[#0C0C0D]">{(parseFloat(selectedLocalCurrency || '0') * 0.025).toFixed(2)} {getPhoneSymbol(selectedCountry || '')}</p>
+              <p className="text-sm font-normal text-[#0C0C0D]">Estimated Fee:</p>
+              <p className="text-sm font-normal text-[#0C0C0D]">{(parseFloat(selectedLocalCurrency || '0') * 0.025).toFixed(2)} {getPhoneSymbol(selectedCountry || '')}</p>
             </div>
           </div>
 
