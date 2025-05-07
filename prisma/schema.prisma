@@ -27,30 +27,54 @@ datasource db {
 model User {
   id        String   @id @default(uuid()) @map("_id")
   email     String   @unique
-  password  String
+  userName  String?  // Add this field
+  password  String?
+  phone_no  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  orders    Order[]  
+  // This is the back relation, one to many, query all orders for a user directly
+  //from the User model
+  txns      Transaction[]  
+  //saveForFuture Boolean @default(false) // Add this field to track if user wants to save info
+  walletAddress  String?
+
+}
+
+//create a model for the Order======
+model Order {
+  id            String   @id @default(uuid()) @map("_id")
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String   // This is the foreign key field
+  status        String    //order can be complete or notyet
+  createdAt     DateTime @default(now())
+  
+  blk_network   String
+  country       String
+  pay_mthd      String
+  order_mode    String 
+  subtotal      BigInt    //how much are we charging the user
+  total         BigInt    // how much to charge plus the processing fees
+
+  txns          Transaction[] // One-to-many with Transaction
+  updatedAt     DateTime @updatedAt
+  order_tag     String?
+
+  payment_reference String? @unique // Flutterwave tx_ref
 }
 
 
-
-model OnRamp {
-  id             String       @id @default(uuid()) @map("_id")
-  walletadress   String     //coz its just a string, but we must declare it as rqd
-  txnhash        String     //the hash  proves everything
-  amountCharged  String   //amount to be charged from the end user
-  isComplete     Boolean      @default(false) //whether transaction is complete or not
-  createdAt      DateTime     @default(now())
+//creata a model for the transaction now
+model Transaction {
+  id         String   @id @default(uuid()) @map("_id")
+  order      Order    @relation(fields: [orderId], references: [id])
+  orderId    String   // This is the foreign key field
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String   // Foreign key to User
+  status     Boolean   //track whether the txn failed or succeeded
+  txn_hash   String?  @unique // Nullable unique transaction hash from blockchain
+  createdAt  DateTime @default(now())
 }
 
-
-//now the Offramp table
-model OffRamp {
-  id             String       @id @default(uuid()) @map("_id")
-  phoneno        String       //when we are offramping we send money to your phone no
-  txnhash        String     //the hash  proves everything
-  amountPaid     String      //amount to be disbursed
-  isComplete     Boolean      @default(false) //whether transaction is complete or not
-  createdAt      DateTime     @default(now())
-}
+//===i think i dont need the Offramp and Onramp tables=====
 

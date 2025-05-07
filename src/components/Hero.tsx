@@ -12,10 +12,14 @@ import { setSelectedCountry,
   setMobileCarrier,
   setCryptoExchangeState
  } from '@/app/store/checkoutForumSlice';
+//go ahead and import useSelector
+import { useAppDispatch } from '../app/lib/store';
+import { InitiateOrder } from '../app/actions/orderActions';
+import { OrderType } from '../app/actions/actionTypes';
 
  
 const Hero: React.FC = () => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch(); // Removed redundant declaration
   const selectedCountry = useSelector((state: RootState) => state.checkoutForum.selectedCountry);
   const ugxAmount = useSelector((state: RootState) => state.checkoutForum.localCurrencyInput);
   const bnbAmount = useSelector((state: RootState) => state.checkoutForum.cryptoCurrencyOutput);
@@ -156,6 +160,10 @@ const Hero: React.FC = () => {
       dispatch(setLocalCurrencyInput(''));
     }
   };
+
+
+  //===now declare the dispatch const here ===
+  const dispatch = useAppDispatch();
 
   return (
     <div className="bg-gradient-to-r from-[#191E29] to-[#25BA88] py-10">
@@ -409,7 +417,27 @@ const Hero: React.FC = () => {
                   onClick={(e) => {
                     if (!isFormComplete) {
                       e.preventDefault();
+                      return;
                     }
+
+                    //create the order payload
+                    const orderPayload = {
+                      type: CryptoExchangeState ? OrderType.BUY : OrderType.SELL,
+                      asset: {
+                        symbol: 'USDC',
+                        name: selectedNetwork === 'Starknet' ? 'USDC(Starknet)' :
+                              selectedNetwork === 'Lisk' ? 'USDC(Lisk)' : 
+                              selectedNetwork === 'Celo' ? 'USDC(CELO)' : 'USDC',
+                        amount:parseFloat(bnbAmount || '0'),
+                        network: selectedNetwork
+                      },
+                      amount: parseFloat(ugxAmount || '0'),
+                      country:selectedCountry,
+                      paymthd: paymentMethod
+                    };
+                    
+                    //dispatch the action now
+                    dispatch(InitiateOrder(orderPayload) as any);
                   }}
                 >
                   Proceed Order

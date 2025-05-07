@@ -1,17 +1,33 @@
 
 import { ARGENT_WEBWALLET_URL, CHAIN_ID } from "@/constants";
+
 import {
     isInArgentMobileAppBrowser,
     ArgentMobileConnector,
-} from "starknetkit/argentMobile"
+  } from "starknetkit/argentMobile"
+//import {
+    //isInArgentMobileAppBrowser,
+    //ArgentMobileConnector,
+//    ArgentMobileConnector,
+//    BraavosMobileConnector,
+//    WebWalletConnector
+//} from "starknetkit"
+
+
 
 import {
     BraavosMobileConnector,
     isInBraavosMobileAppBrowser,
 } from "starknetkit/braavosMobile"
 
-import { InjectedConnector } from "@starknet-react/core";
+
+//import { InjectedConnector } from "@starknet-react/core";
+//import { WebWalletConnector } from "starknetkit/webwallet"
+
+import { InjectedConnector } from "starknetkit/injected"
 import { WebWalletConnector } from "starknetkit/webwallet"
+
+//import { WebWalletConnector } from "starknetkit/dist/connectors";
 import { getStarknet } from "@starknet-io/get-starknet-core"
 import { Connector } from "starknetkit";
 
