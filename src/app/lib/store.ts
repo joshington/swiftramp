@@ -3,7 +3,6 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import { useDispatch, TypedUseSelectorHook, useSelector } from "react-redux";
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-//import rootReducer from '../reducers'; // This should already include orderReducer
 import { orderReducer } from '../reducers/orderReducer';
 import { userReducer } from '../reducers/userReducer';
 
@@ -19,10 +18,6 @@ const rootReducer = combineReducers({
     //order:orderReducer,
     user:persistReducer(persistConfig, userReducer)
 });
-
-
-
-
 
 export const store = configureStore({
     reducer: rootReducer, // Use the persisted reducer directly

@@ -23,13 +23,6 @@ import { generateTransactionReference } from '@/utils/chargeFlutterwave';
 import { chargeWithFlutterwave } from '@/utils/chargeFlutterwave';
 import { OrderStatus } from '../actions/actionTypes';
 
-const CheckoutPage: React.FC = () => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
 interface MobileMoneyPayload {
   amount: number;
   currency: string;
@@ -45,6 +38,13 @@ interface MobileMoneyPayload {
   voucher?: number;
   network: string;
 }
+
+const CheckoutPage: React.FC = () => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const router = useRouter();
 
@@ -217,11 +217,11 @@ interface MobileMoneyPayload {
     }
   
 
-    if (!currentOrder) {
+    {/*if (!currentOrder) {
       alert('No order found');
       return;
     }
-   
+   */}
     
 
     const userInfo = {
@@ -389,7 +389,7 @@ interface MobileMoneyPayload {
     //}
   };
  
-  if (!currentOrder) {
+  {/*if (!currentOrder) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
@@ -400,7 +400,7 @@ interface MobileMoneyPayload {
         </div>
       </div>
     );
-  }
+  }*/}
 
   return (
     <div className="min-h-screen bg-[#F4F4F4] py-4 px-4 sm:px-6 lg:px-8">
