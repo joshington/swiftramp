@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 //import { authOptions } from "./api/auth/route";
 import { getServerSession } from "next-auth"
+import Providers from "./Providers";
 
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -12,6 +13,7 @@ import "./globals.css";
 
 import ReduxProvider from "./redux-provider";
 import { StarknetProvider } from "@/components/starknet-provider";
+import { StoreProvider } from "./store/StoreProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,18 +34,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <ReduxProvider>
+    <StoreProvider>
+      <html lang="en">
+        <body>
           <StarknetProvider>
             {children}
-            {/*
-              <Footer />
-            */}
-            
           </StarknetProvider>
-        </ReduxProvider>
-      </body>
-    </html>
+        </body>
+      </html>
+    </StoreProvider>
   );
 }

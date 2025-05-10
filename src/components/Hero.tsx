@@ -1,24 +1,32 @@
-
-
-// src/components/Hero.tsx
+//src/components/Hero.tsx
 import React, { useState, useEffect } from 'react';
 import Link from "next/link";
 import { FiCalendar, FiChevronDown} from 'react-icons/fi';
 
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/app/store/store';
+import { setSelectedCountry,
+  setLocalCurrencyInput,
+  setCryptoCurrencyOutput,
+  setPaymentMethod,
+  setMobileCarrier,
+  setCryptoExchangeState
+ } from '@/app/store/checkoutForumSlice';
 //go ahead and import useSelector
 import { useAppDispatch } from '../app/lib/store';
 import { InitiateOrder } from '../app/actions/orderActions';
 import { OrderType } from '../app/actions/actionTypes';
 
+ 
 const Hero: React.FC = () => {
-  const [isBuying, setIsBuying] = useState(true);
-  const [paymentMethod, setPaymentMethod] = useState('');
-  const [mobileCarrier, setMobileCarrier] = useState('');
-  const [selectedCountry, setSelectedCountry] = useState('Uganda');
-  const [ugxAmount, setUgxAmount] = useState('');
-  const [bnbAmount, setBnbAmount] = useState('');
+  // const dispatch = useDispatch(); // Removed redundant declaration
+  const selectedCountry = useSelector((state: RootState) => state.checkoutForum.selectedCountry);
+  const ugxAmount = useSelector((state: RootState) => state.checkoutForum.localCurrencyInput);
+  const bnbAmount = useSelector((state: RootState) => state.checkoutForum.cryptoCurrencyOutput);
+  const paymentMethod = useSelector((state: RootState) => state.checkoutForum.paymentMethod);
+  const mobileCarrier = useSelector((state: RootState) => state.checkoutForum.mobileCarrier);
+  const CryptoExchangeState = useSelector((state: RootState) => state.checkoutForum.isBuying);
   const [isFormComplete, setIsFormComplete] = useState(false);
-
 
   const [isLocalInputFocused, setIsLocalInputFocused] = useState(false);
 
@@ -103,11 +111,15 @@ const Hero: React.FC = () => {
     if(paymentMethod !== 'Mobile Money'){
       setMobileCarrier('');
     } 
-    const requiredFieldsFilled = 
-      selectedCountry && 
-      paymentMethod && 
-      (paymentMethod !== 'Mobile Money' || mobileCarrier) && 
-      (parseFloat(ugxAmount) > 0|| parseFloat(bnbAmount) > 0);
+    const ugxNum = parseFloat(ugxAmount);
+    const bnbNum = parseFloat(bnbAmount);
+    
+    // Check if the selected country, payment method, and mobile carrier (if applicable) are filled
+    const requiredFieldsFilled =
+    selectedCountry &&
+    paymentMethod &&
+    (paymentMethod !== 'Mobile Money' || mobileCarrier) &&
+    (!isNaN(ugxNum) && ugxNum > 0 || !isNaN(bnbNum) && bnbNum > 0);
     setIsFormComplete(!!requiredFieldsFilled);
   }, [selectedCountry, paymentMethod, mobileCarrier, ugxAmount, bnbAmount]);
 
@@ -124,28 +136,28 @@ const Hero: React.FC = () => {
 
   const handleLocalAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setUgxAmount(value);
+    dispatch(setLocalCurrencyInput(value));
 
     if (value && !isNaN(Number(value))) {
       const rate = exchangeRates[getCurrencySymbol(selectedCountry) as keyof typeof exchangeRates];
 
       const bnbValue = (Number(value) / rate).toFixed(6);
-      setBnbAmount(bnbValue);
+      dispatch(setCryptoCurrencyOutput(bnbValue));
     } else {
-      setBnbAmount('');
+      dispatch(setCryptoCurrencyOutput(''));
     }
   };
 
   const handleBnbAmountChange = (e:React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setBnbAmount(value);
+    dispatch(setCryptoCurrencyOutput(value));
 
     if(value && !isNaN(Number(value))) {
       const rate = exchangeRates[getCurrencySymbol(selectedCountry) as keyof typeof exchangeRates];
       const localValue = (Number(value) * rate).toFixed(2);
-      setUgxAmount(localValue);
+      dispatch(setLocalCurrencyInput(localValue));
     } else {
-      setUgxAmount('');
+      dispatch(setLocalCurrencyInput(''));
     }
   };
 
@@ -205,19 +217,27 @@ const Hero: React.FC = () => {
           {/* Right side - Buy/Sell component (reduced width) */}
           <div className="lg:w-3/5 bg-white rounded-xl p-12 scale-85">
           <div className="flex justify-center items-center mb-5">
-                <button 
-                  onClick={() => setIsBuying(true)}
-                  className={`px-8 py-1 rounded-l-full text-sm ${isBuying ? 'bg-[#25BA88] text-white' : 'bg-gray-100 text-gray-700'}`}
-                >
-                  Buy Crypto
-                </button>
-                <button 
-                  onClick={() => setIsBuying(false)}
-                  className={`px-8 py-1 rounded-r-full text-sm  ${!isBuying ? 'bg-[#25BA88] text-white' : 'bg-gray-100 text-gray-700'}`}
-                >
-                  Sell Crypto
-                </button>
-              </div>
+              <button 
+                onClick={() => {
+                  dispatch(setCryptoCurrencyOutput(''));
+                  dispatch(setLocalCurrencyInput(''));
+                  dispatch(setCryptoExchangeState(true));;
+                }}
+                className={`cursor-pointer px-8 py-1 rounded-l-full text-sm ${CryptoExchangeState ? 'bg-[#25BA88] text-white' : 'bg-gray-100 text-gray-700'}`}
+              >
+                Buy Crypto
+              </button>
+              <button 
+                onClick={() => {
+                  dispatch(setCryptoCurrencyOutput(''));
+                  dispatch(setLocalCurrencyInput(''));
+                  dispatch(setCryptoExchangeState(false));;
+                }}
+                className={`cursor-pointer px-8 py-1 rounded-r-full text-sm ${!CryptoExchangeState ? 'bg-[#25BA88] text-white' : 'bg-gray-100 text-gray-700'}`}
+              >
+                Sell Crypto
+              </button>
+            </div>
 
             <div className="space-y-5">
               {/* Country Selector Dropdown */}
@@ -226,7 +246,7 @@ const Hero: React.FC = () => {
                 <select
                   id="country"
                   defaultValue={selectedCountry}
-                  onChange={(e) => setSelectedCountry(e.target.value)}
+                  onChange={(e) => dispatch(setSelectedCountry(e.target.value))}
                   className="block w-full px-4 py-4 text-base text-gray-700 bg-white border-2 border-[#25BA88] 
                             rounded-lg focus:ring-[#25BA88] focus:border-[#25BA88] 
                             focus:outline-none"
@@ -252,7 +272,7 @@ const Hero: React.FC = () => {
                       name="paymentMethod"
                       value="Mobile Money"
                       checked={paymentMethod === 'Mobile Money'}
-                      onChange={() => setPaymentMethod('Mobile Money')}
+                      onChange={() => dispatch(setPaymentMethod('Mobile Money'))}
                       className="h-4 w-4 text-green-500 focus:ring-green-500 border-gray-300"
                     />
                     <span className="text-gray-700 text-sm">Mobile Money</span>
@@ -263,7 +283,7 @@ const Hero: React.FC = () => {
                       name="paymentMethod"
                       value="Credit Card"
                       checked={paymentMethod === 'Credit Card'}
-                      onChange={() => setPaymentMethod('Credit Card')}
+                      onChange={() => dispatch(setPaymentMethod('Credit Card'))}
                       className="h-4 w-4 text-green-500 focus:ring-green-500 border-gray-300"
                     />
                     <span className="text-gray-700 text-sm">Credit Card</span>
@@ -285,7 +305,7 @@ const Hero: React.FC = () => {
                           name="mobileCarrier"
                           value={carrier}
                           checked={mobileCarrier === carrier}
-                          onChange={() => setMobileCarrier(carrier)}
+                          onChange={() => dispatch(setMobileCarrier(carrier))}
                           className="h-4 w-4 text-green-500 focus:ring-green-500 border-gray-300"
                         />
                         <span className="text-gray-700 text-sm">{carrier}</span>
@@ -298,7 +318,7 @@ const Hero: React.FC = () => {
 
               <div className="mb-5">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  You are currently: <span className="text-[#25BA88]">{isBuying ? 'Buying' : 'Selling'}</span>
+                  You are currently: <span className="text-[#25BA88]">{CryptoExchangeState ? 'Buying' : 'Selling'}</span>
                 </h3>
 
                 {bnbAmount && !isNaN(Number(bnbAmount)) && (
@@ -328,7 +348,7 @@ const Hero: React.FC = () => {
                                   ${isLocalInputFocused || ugxAmount !== '' ? 'pl-3' : 'pl-10'} pr-3 
                                   py-4 border border-[#F4F4F4] rounded-md focus:outline-none 
                                   focus:ring-[#25BA88] focus:border-[#25BA88] text-black text-sm`}
-                      placeholder={isBuying ? "0-" : "0+"} 
+                      placeholder={CryptoExchangeState ? "0-" : "0+"} 
                     />
                       <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         {CurrencyIcons[getCurrencySymbol(selectedCountry) as keyof typeof CurrencyIcons]()}
@@ -368,7 +388,7 @@ const Hero: React.FC = () => {
                       onChange={handleBnbAmountChange}
                       className="w-2/3 py-2 px-3 bg-[#F4F4F4] text-black text-sm text-right
                                 focus:outline-none focus:ring-green-500"
-                      placeholder={isBuying ? "+0" : "-0"}
+                      placeholder={CryptoExchangeState ? "+0" : "-0"}
                     />
                     <span className="text-gray-500 text-sm pr-3">
                       USDC
@@ -402,7 +422,7 @@ const Hero: React.FC = () => {
 
                     //create the order payload
                     const orderPayload = {
-                      type: isBuying ? OrderType.BUY : OrderType.SELL,
+                      type: CryptoExchangeState ? OrderType.BUY : OrderType.SELL,
                       asset: {
                         symbol: 'USDC',
                         name: selectedNetwork === 'Starknet' ? 'USDC(Starknet)' :
@@ -417,7 +437,7 @@ const Hero: React.FC = () => {
                     };
                     
                     //dispatch the action now
-                    dispatch(InitiateOrder(orderPayload));
+                    dispatch(InitiateOrder(orderPayload) as any);
                   }}
                 >
                   Proceed Order

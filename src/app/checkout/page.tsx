@@ -8,6 +8,10 @@ import { useRouter } from 'next/navigation';
 import { useAccount, useBalance, useStarkProfile } from "@starknet-react/core"
 
 import { FiArrowLeft } from 'react-icons/fi';
+import { RootState } from '../store/store';
+import { useSelector } from 'react-redux';
+import TermsModal from '../../components/modal/termsmodal';
+import PhoneVerificationModal from '../../components/modal/PhoneVerificationModal';
 import { useAppDispatch, useAppSelector } from '../lib/store';
 import Receipt from '@/components/Receipt';
 import { saveUserInfo, clearUserInfo } from '../actions/userActions';
@@ -19,23 +23,28 @@ import { generateTransactionReference } from '@/utils/chargeFlutterwave';
 import { chargeWithFlutterwave } from '@/utils/chargeFlutterwave';
 import { OrderStatus } from '../actions/actionTypes';
 
-const CheckoutPage: React.FC = () => {
+interface MobileMoneyPayload {
+  amount: number;
+  currency: string;
+  email: string;
+  tx_ref: string;
+  phone_number: string;
+  order_id?: string;
+  fullname?: string;
+  client_ip?: string;
+  device_fingerprint?: string;
+  meta?: Record<string, any>;
+  redirect_url?: string;
+  voucher?: number;
+  network: string;
+}
 
-  interface MobileMoneyPayload {
-    amount: number;
-    currency: string;
-    email: string;
-    tx_ref: string;
-    phone_number: string;
-    order_id?: string;
-    fullname?: string;
-    client_ip?: string;
-    device_fingerprint?: string;
-    meta?: Record<string, any>;
-    redirect_url?: string;
-    voucher?: number;
-    network: string;
-  }
+const CheckoutPage: React.FC = () => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const router = useRouter();
 
@@ -60,10 +69,45 @@ const CheckoutPage: React.FC = () => {
   const [userName, setUserName] = useState('');
 
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [email, setEmail] = useState('');
   const [saveInfo, setSaveInfo] = useState(false);
   const [walletConnected, setWalletConnected] = useState(false);
+  const [selectedWallet, setSelectedWallet] = useState('');
 
+  const [showTerms, setShowTerms] = useState(false);
+  const [showPhoneVerification, setShowPhoneVerification] = useState(false);
+
+  const selectedCountry = useSelector((state: RootState) => state.checkoutForum.selectedCountry);
+  console.log("Selected country:", selectedCountry);
+
+  const selectedPaymentMethod = useSelector((state: RootState) => state.checkoutForum.paymentMethod);
+  console.log("Selected Payment Method:", selectedPaymentMethod);
+
+  const selectedLocalCurrency = useSelector((state: RootState) => state.checkoutForum.localCurrencyInput);
+  console.log("Selected Local amount:", selectedLocalCurrency);
+
+  const selectedCrypto = useSelector((state: RootState) => state.checkoutForum.cryptoCurrencyOutput);
+  console.log("Selected Crypto amout:", selectedCrypto);
+
+  const selectedMobileCarrier = useSelector((state: RootState) => state.checkoutForum.mobileCarrier);
+  console.log("Selected Mobile Carrier:", selectedMobileCarrier);
+
+  const selectedCryptoExchangeState = useSelector((state: RootState) => state.checkoutForum.isBuying);
+  console.log("Selected Crypto Exchange State:", selectedCryptoExchangeState);
+
+  const getCryptoExchangeState = () => {
+    if (selectedCryptoExchangeState) {
+      return "Buying";
+    }
+    return "Selling";
+  }
+
+  const carriersByCountry = {
+    Uganda: ['MTN Uganda', 'Airtel Uganda'],
+    Kenya: ['Safaricom', 'Airtel Kenya'],
+    Tanzania: ['Vodacom', 'Airtel Tanzania'],
+    Sudan: ['MTN Sudan', 'Zain Sudan'],
+    Rwanda: ['MTN Rwanda', 'Airtel Rwanda'],
+  };
 
   const dispatch = useAppDispatch();
   const { currentOrder } = useAppSelector((state) => state.order);
@@ -86,21 +130,76 @@ const CheckoutPage: React.FC = () => {
     }
   }, [user]);
 
- 
 
-  // Mock transaction details
-  const transactionDetails = {
-    crypto: {
-      symbol: 'USDT',
-      amount: 100,
-    },
-    paymentMethod: 'Mobile Money',
-    mobileCarrier: 'MTN Uganda',
-    subtotal: 366483,
-    fee: 1125,
-    total: 367608,
-    currency: 'UGX'
-  };
+  const mobileCarriers = carriersByCountry[selectedCountry as keyof typeof carriersByCountry || 'Uganda'] || [];
+  console.log("Available Mobile Carriers:", mobileCarriers);
+
+  const getPhoneSymbol = (country: string) => {
+    switch(country) {
+      case 'Uganda': return 'UGX';
+      case 'Kenya': return 'KES';
+      case 'Tanzania': return 'TZS';
+      case 'Sudan': return 'SDG';
+      case 'Rwanda': return 'RWF';
+      default: return 'UGX';
+    }
+  }
+
+  const phoneSymbol = getPhoneSymbol(selectedCountry || '');
+
+    //icons for phonecode
+    const phoneIcons = {
+      UGX: () => (
+        <div className="flex items-center gap-1">
+          <img
+            src="/flags/ug.png"
+            alt="Ugandan Flag"
+            className="h-5.5 w-6"
+          />
+          <span className="text-sm font-medium text-black">+256</span>
+        </div>
+      ),
+      KES: () => (
+        <div className="flex items-center gap-1">
+          <img
+            src="/flags/ke.png"
+            alt="Kenyan Flag"
+            className="h-5.5 w-6"
+          />
+          <span className="text-sm font-medium text-black">+254</span>
+        </div>
+      ),
+      TZS: () => (
+        <div className="flex items-center gap-1">
+          <img
+            src="/flags/tz.png"
+            alt="Tanzanian Flag"
+            className="h-5.5 w-6"
+          />
+          <span className="text-sm font-medium text-black">+255</span>
+        </div>
+      ),
+      SDG: () => (
+        <div className="flex items-center gap-1">
+          <img
+            src="/flags/sd.png"
+            alt="Sudanese Flag"
+            className="h-5.5 w-6"
+          />
+          <span className="text-sm font-medium text-black">+249</span>
+        </div>
+      ),
+      RWF: () => (
+        <div className="flex items-center gap-1">
+          <img
+            src="/flags/rw.png"
+            alt="Rwandan Flag"
+            className="h-5.5 w-6"
+          />
+          <span className="text-sm font-medium text-black">+250</span>
+        </div>
+      ),
+    };
 
   const handleConnectWallet = () => {
     // In a real app, this would connect to a wallet provider
@@ -118,11 +217,11 @@ const CheckoutPage: React.FC = () => {
     }
   
 
-    if (!currentOrder) {
+    {/*if (!currentOrder) {
       alert('No order found');
       return;
     }
-   
+   */}
     
 
     const userInfo = {
@@ -135,9 +234,12 @@ const CheckoutPage: React.FC = () => {
     try{
       if(userInfo){
         //now that we have the data, create the user
-        dispatch(
-          saveUserInfo(userInfo)
-        ); //dispatching the action to save the userinfo
+        {/*dispatch(
+          dispatch(saveUserInfo(userInfo))
+        );*/}
+
+        
+        //dispatching the action to save the userinfo
         //now save to the DB
         await fetch('/api/user/save-info', {
           method: 'POST',
@@ -287,7 +389,7 @@ const CheckoutPage: React.FC = () => {
     //}
   };
  
-  if (!currentOrder) {
+  {/*if (!currentOrder) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
@@ -298,194 +400,331 @@ const CheckoutPage: React.FC = () => {
         </div>
       </div>
     );
-  }
+  }*/}
 
   return (
-    
-    
-    <div className="flex flex-col md:flex-row gap-6 items-center justify-center  w-full mt-9">
-      <div className="w-full md:w-1/2 bg-white rounded-lg shadow-md p-6">
-          <Receipt />
+    <div className="min-h-screen bg-[#F4F4F4] py-4 px-4 sm:px-6 lg:px-8">
+
+      <div className="max-w-6xl mx-auto flex items-center justify-start py-6">
+        <Link href="/" className="flex items-center">
+          <img
+            src="/Logo/Swift Ramp (dark version).png" 
+            alt="swift Logo"
+            className="h-11 w-auto"
+          />
+        </Link>
       </div>
-      <div className="w-full md:w-1/3 bg-white rounded-lg shadow-md p-6">
-       {/* Header */}
-        <div className="p-6">
-          <div className="items-center mb-6">
-            <Link href="/" className="mr-2">
-              <FiArrowLeft className="text-gray-600" size={20} />
-            </Link>
-            <h1 className="text-2xl font-bold text-gray-800">SwiftRamp</h1>
-          </div>
-          
-          <h2 className="text-xl font-semibold text-gray-700 mb-6">Checkout</h2>
-          
-          {/*
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
+
+      <div className='flex flex-row items-start'>
+      {/* first div for the left side of the page*/}
+        <div className="max-w-md mx-auto bg-white rounded-xl overflow-hidden md:max-w-2xl">
+          {/* Header */}
+          <div className="p-6">
+            <div className="flex items-center mb-6">
+              <Link href="/" className="mr-2">
+                <FiArrowLeft className="text-[#25BA88]" size={20} />
+              </Link>
+              <p className="font-normal text-[#25BA88]">Go back</p>
             </div>
 
-          */}
-          
-
-          {/* Personal Information Form */}
-          <div className="space-y-4 mb-8">
+            <div className="flex justify-center w-full">
+              <h2 className="text-xl font-semibold text-[#25BA88] mb-6">Checkout</h2>
+            </div>
             
+            {/* Personal Information Form */}
+            <div className="space-y-4 mb-8">
+              
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="w-full md:w-1/2">
+                    <input
+                      type="text"
+                      value={firstName}
+                      placeholder={"First Name"}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      className="w-full px-3 py-3 bg-[#F4F4F4] rounded-md 
+                        focus:outline-none focus:ring-2 focus:ring-[#25BA88] text-black"
+                    />
+                  </div>
+
+                  <div className="w-full md:w-1/2">
+                    <input
+                      type="text"
+                      value={lastName}
+                      placeholder={"Last Name"}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className="w-full px-3 py-3 bg-[#F4F4F4] rounded-md 
+                        focus:outline-none focus:ring-2 focus:ring-[#25BA88] text-black"
+                    />
+                  </div>
+                </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  User name
-                </label>
                 <input
-                  type="text"
-                  value={userName}
-                  onChange={(e) => setUserName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md 
-                    focus:outline-none focus:ring-2 focus:ring-green-500 text-black"
-                  required
+                  type="email"
+                  value={email}
+                  placeholder={"Email"}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-3 py-3 bg-[#F4F4F4] 
+                    rounded-md focus:outline-none focus:ring-2 focus:ring-[#25BA88] text-black"
                 />
               </div>
-             
-            
 
-            <div>
-              
-              
-              <div className="flex">
-                {/*
-                  <select className="w-1/3 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option>Select Wallet</option>
-                    <option>MetaMask</option>
-                    <option>Trust Wallet</option>
-                    <option>Coinbase Wallet</option>
-                  </select>
-                */}
-                
-                {/*
-                  <button
-                    onClick={handleConnectWallet}
-                    className={`w-2/3 px-4 py-2
-                      rounded-r-md font-medium ${
-                        walletConnected 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-blue-600 text-white hover:bg-blue-700'}
-                      `}
-                  >
-                    {walletConnected ? 'Connected ✓' : <HeaderConnectButton />}
-                  </button>
-                  */}
-               
-                
-
-{
-  isConnected ? (
-    <div className="space-y-2 p-3 border border-green-200 rounded-md bg-green-50">
-      <div className="flex items-center">
-        <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
-        <span className="text-sm font-medium text-green-800">Wallet Connected</span>
-      </div>
-      
-      {
-        strkBalance && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Balance:</span>
-                      <span className="font-medium text-black">
-                        {
-                          parseFloat(strkBalance.formatted).toFixed(4)} {strkBalance.symbol}
-                      </span>
-                    </div>
-                  )}
-                  
-                  {data?.name && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Starknet ID:</span>
-                      <span className="font-medium">{data.name}</span>
-                    </div>
-                  )}
-                  
-                  {address && (
-                    <div className="text-xs text-gray-500 truncate">
-                      {address.slice(0, 6)}...{address.slice(-4)}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <HeaderConnectButton />
-              )
-            }
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phone number</label>
-              <div className="flex">
-                <div className="w-1/4 px-3 py-2 border border-gray-300 
-                  rounded-l-md bg-gray-100 flex items-center justify-center text-black">
-                  +256
-                </div>
+              <div>
                 <input
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  className="w-3/4 px-3 py-2 border-t border-r 
-                    border-b border-gray-300 rounded-r-md focus:outline-none 
-                    focus:ring-2 focus:ring-green-500 text-black"
-                  placeholder="Phone number"
-                  required
+                  type="password"
+                  value={password}
+                  placeholder={"Password"}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-3 py-3 bg-[#F4F4F4] 
+                    rounded-md focus:outline-none focus:ring-2 focus:ring-[#25BA88] text-black"
                 />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 
-                  rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-black"
-                required
-              />
-            </div>
-            {/*
+              <div>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  placeholder={"Confirm Password"}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-3 py-3 bg-[#F4F4F4] 
+                    rounded-md focus:outline-none focus:ring-2 focus:ring-[#25BA88] text-black"
+                />
+              </div>
+
               <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="saveInfo"
-                checked={saveInfo}
-                onChange={(e) => setSaveInfo(e.target.checked)}
-                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-              />
-              <label htmlFor="saveInfo" className="ml-2 block text-sm text-gray-700">
-                Save information for future exchange
-              </label>
+                <input
+                  type="checkbox"
+                  id="termsAndConditions"
+                  className="h-4 w-4 text-green-600 focus:ring-[#25BA88] border-gray-300 rounded cursor-pointer"
+                />
+                 <label htmlFor="termsAndConditions" className="ml-2 block text-sm text-gray-700">
+                    I agree to the  
+                    <span 
+                      className="text-[#25BA88] underline cursor-pointer ml-1" 
+                      onClick={() => setShowTerms(true)}
+                    >
+                      terms and conditions
+                    </span>
+                  </label>
+                <TermsModal isOpen={showTerms} onClose={() => setShowTerms(false)} />
+              </div>
+
+              <hr className="my-4 h-px border-t-0 bg-[#E3E3E3]" />
+
+              {/* Payment Details Form */}
+
+              <div className="flex justify-center w-full">
+                <h2 className="text-xl font-semibold text-[#25BA88] mb-2">Payment Details</h2>
+              </div>
+
+              {selectedPaymentMethod === "Mobile Money" ? (
+                <div>
+                  <div className="flex space-x-2">
+                    <select
+                      className="w-2/3 px-3 py-4 border border-[#25BA88] text-gray-400 cursor-pointer text-sm rounded-md mr-5 focus:outline-none focus:ring-2 focus:ring-[#25BA88]"
+                      onChange={(e) => setSelectedWallet(e.target.value)}
+                    >
+                      <option value="">Select Wallet Address</option>
+                      <option value="MetaMask">MetaMask</option>
+                      <option value="Trust Wallet">Trust Wallet</option>
+                      <option value="Coinbase Wallet">Coinbase Wallet</option>
+                    </select>
+
+                    <button
+                      onClick={handleConnectWallet}
+                      disabled={!selectedWallet}
+                      className={`w-1/3 px-4 py-2 rounded-md font-medium transition ${
+                        walletConnected
+                          ? 'bg-green-100 text-green-800'
+                          : selectedWallet
+                          ? 'bg-[#25BA88] text-white hover:bg-[#0B9567] cursor-pointer'
+                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
+                    >
+                      {walletConnected ? 'Connected ✓' : 'Connect Wallet'}
+                    </button>
+                  </div>
+
+                  <div>
+                    <div className="flex py-4">
+                      <div
+                        className="w-1/4 px-3 py-2 bg-[#F4F4F4] rounded-l-md bg-gray-100 flex items-center justify-center text-black"
+                      >
+                        {phoneIcons[phoneSymbol as keyof typeof phoneIcons]?.()}
+                      </div>
+                      <input
+                        type="tel"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        className="w-3/4 px-3 py-3 bg-[#F4F4F4] rounded-r-md focus:outline-none focus:ring-2 focus:ring-[#25BA88] text-black"
+                        placeholder="Phone number"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : selectedPaymentMethod === "Credit Card" ? (
+                <div>
+                  <div className="space-y-4">
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Cardholder Name"
+                        className="w-full px-3 py-3 bg-[#F4F4F4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#25BA88] text-black"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Card Number"
+                        className="w-full px-3 py-3 bg-[#F4F4F4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#25BA88] text-black"
+                      />
+                    </div>
+                    <div className="flex space-x-4">
+                      <div className="w-1/2">
+                        <input
+                          type="text"
+                          placeholder="MM/YYYY"
+                          className="w-full px-3 py-3 bg-[#F4F4F4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#25BA88] text-black"
+                        />
+                      </div>
+                      <div className="w-1/2">
+                        <input
+                          type="text"
+                          placeholder="CVV"
+                          className="w-full px-3 py-3 bg-[#F4F4F4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#25BA88] text-black"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="saveInfo"
+                  checked={saveInfo}
+                  onChange={(e) => setSaveInfo(e.target.checked)}
+                  className="h-4 w-4 text-green-600 cursor-pointer focus:ring-[#25BA88] border-gray-300 rounded"
+                />
+                <label htmlFor="saveInfo" className="ml-2 block cursor-pointer text-sm text-gray-700">
+                  Save information for future exchange
+                </label>
+              </div>
             </div>
-            */}
+
+            {/* Pay Now Button */}
+            <button
+              onClick={() => {
+                if (selectedPaymentMethod === "Mobile Money") {
+                  setShowPhoneVerification(true);
+                  <div className="flex items-center">
+                    <PhoneVerificationModal isOpen={showPhoneVerification} onClose={() => setShowPhoneVerification(false)} />
+                  </div>
+                  } 
+              
+              else {
+                  console.log("Processing payment...");
+                }
+              }}
+              className="w-full bg-[#25BA88] hover:bg-[#0B9567] cursor-pointer text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150"
+            >
+              Pay Now
+            </button>
+            <PhoneVerificationModal
+              isOpen={showPhoneVerification}
+              onClose={() => setShowPhoneVerification(false)}
+            />
+          </div>
+        </div>
+                      
+        {/* Second div for the right side of the page*/}
+        <div className="max-w-3xl mx-auto bg-white rounded-xl overflow-hidden mt-4">
+          <div className="p-6">
+            <div className="flex justify-center w-full">
+              <h2 className="text-xl font-semibold text-[#25BA88]">Order Summary</h2>
+            </div>
             
           </div>
 
-          {/* Divider */}
-          <div className="border-t border-gray-200 my-6"></div>
+          {/* Header */}
+          <div className="p-2">
+            <div className="flex justify-center w-full">
+              <h2 className="text-xl font-normal text-[#0C0C0D] mb-2">You are currently:
+                <span className="text-[#25BA88]"> {getCryptoExchangeState()}</span>
+              </h2>
+            </div>
 
-          
+            <div className="flex justify-center w-full">
+              <h3 className="text-xl font-normal text-[#0C0C0D] mb-6">
+                <span className="text-[#25BA88]">USDC</span>
+                <span className="text-[#0C0C0D] font-semibold"> {selectedCrypto ? `$${selectedCrypto}` : ': 0'}</span>
+              </h3>
+            </div>
+          </div>
 
-           
+          <div className="space-y-4 mb-8 w-full max-w-md">
+            <div className="flex justify-between items-center px-6 gap-4">
+              <p className="text-sm font-normal text-[#0C0C0D]">Payment Method:</p>
+              <select
+                value={selectedPaymentMethod || ''}
+                onChange={(e) => console.log(`Selected Payment Method: ${e.target.value}`)}
+                className="text-sm font-normal text-[#0C0C0D] cursor-pointer px-2 py-1 focus:outline-none"
+              >
+                <option value="" disabled>Select Payment Method</option>
+                <option value="Mobile Money">Mobile Money</option>
+                <option value="Credit Card">Credit Card</option>
+              </select>
+            </div>
+          </div>
 
-          {/* Pay Now Button */}
-          <Link
-            onClick={handlePayNow}
-            href={"/order-status"}
-            className="w-full bg-green-600 
-            hover:bg-green-700 text-white font-bold py-3 px-4 
-            rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 
-            focus:ring-offset-2 transition duration-150"
-          >
-            Pay Now
-          </Link>
+          {selectedPaymentMethod === "Mobile Money" && (
+            <div className="space-y-4 mb-8">
+              <div className="flex justify-between items-center px-6">
+                <p className="text-sm font-normal text-[#0C0C0D]">Mobile Carrier:</p>
+                <select
+                  value={selectedMobileCarrier || ''}
+                  onChange={(e) => console.log(`Selected Mobile Carrier: ${e.target.value}`)}
+                  className="text-sm font-normal text-[#0C0C0D] cursor-pointer px-2 py-1 focus:outline-none"
+                >
+                  <option value="" disabled>Select Mobile Carrier</option>
+                  {mobileCarriers.map((carrier) => (
+                    <option key={carrier} value={carrier}>
+                      {carrier}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+
+          <hr className="my-4 h-px border-t-0 bg-[#E3E3E3]" />
+
+          <div className="space-y-4 mb-8">
+            <div className="flex justify-between items-center px-6">
+              <p className="text-sm font-normal text-[#0C0C0D]">Subtotal:</p>
+              <p className="text-sm font-normal text-[#0C0C0D]">{selectedLocalCurrency} {getPhoneSymbol(selectedCountry || '')}</p>
+            </div>
+          </div>
+
+          <div className="space-y-4 mb-8">
+            <div className="flex justify-between items-center px-6">
+              <p className="text-sm font-normal text-[#0C0C0D]">Estimated Fee:</p>
+              <p className="text-sm font-normal text-[#0C0C0D]">{(parseFloat(selectedLocalCurrency || '0') * 0.025).toFixed(2)} {getPhoneSymbol(selectedCountry || '')}</p>
+            </div>
+          </div>
+
+          <hr className="my-4 h-px border-t-0 bg-[#E3E3E3]" />
+
+          <div className="mb-8 px-6">
+            <div className="flex justify-between items-center">
+              <p className="text-sm font-normal text-[#0C0C0D]">Total:</p>
+              <p className="text-sm font-semibold text-[#0C0C0D]">
+                {((parseFloat(selectedLocalCurrency || '0') + parseFloat(selectedLocalCurrency || '0') * 0.025).toFixed(2))}
+                <span className="text-[#25BA88]"> {getPhoneSymbol(selectedCountry || '')}</span>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
       

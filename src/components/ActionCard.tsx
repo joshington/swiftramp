@@ -1,5 +1,3 @@
-
-
 import React, { ReactNode } from 'react';
 
 interface ActionCardProps {
@@ -12,11 +10,11 @@ interface ActionCardProps {
 
 const ActionCard = ({ icon, title, className = '' }: ActionCardProps) => {
   return (
-    <div className={`flex flex-col items-center p-4 rounded-lg  transition ${className}`}>
-      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-green-600 mb-2">
+    <div className={`flex flex-col items-center p-4 rounded-lg cursor-pointer transition ${className}`}>
+      <div className="w-10 h-10 rounded-full p-2 bg-[#25BA88] flex items-center justify-center text-white mb-2">
         {icon}
       </div>
-      <p className="font-medium text-gray-800 text-sm text-center">{title}</p>
+      <p className="font-medium text-[#828282] text-sm text-center">{title}</p>
     </div>
   );
 };
