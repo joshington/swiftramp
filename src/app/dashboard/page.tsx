@@ -40,22 +40,22 @@ const Dashboard = () => {
   return (
     <div className="flex h-screen bg-[#F4F4F4]">
       {/* Side Panel */}
-      <div className={`transition-all duration-300 overflow-hidden bg-[#070F2B] shadow-md flex flex-col h-screen
-        ${menuOpen ? 'w-64' : 'w-0'}
-      `}
-      >
+        <div
+          className={`transition-all duration-300 bg-[#191E29] overflow-hidden flex flex-col
+            ${menuOpen ? 'absolute top-16 left-0 right-0 w-full z-40 opacity-100 md:static md:w-64 md:h-screen md:opacity-100' : 'hidden'}`}
+        >
         <div>
           <div className="p-5">
             <a href="/" className="flex items-center py-6 px-2">
                 <img
-                  src="/Logo/Swift Ramp (Light version).png" // Path to your logo file in the public folder
+                  src="/Logo/Swift Ramp (Light version).png"
                   alt="swift Logo"
-                  className="h-10 w-auto" // Adjust height and width as needed
+                  className="h-10 w-auto"
                 />
             </a>
           </div>
 
-          <nav className="p-4">
+          <nav className="p-4 flex flex-col space-y-2">
             <button
               onClick={() => setActiveTab('home')}
               className={`relative flex items-center space-x-2 w-full p-3 mt-2 cursor-pointer
@@ -64,7 +64,7 @@ const Dashboard = () => {
                   : 'text-gray-300 hover:text-[#25BA88] transition-colors duration-300'
                 }`}
             >
-              <FiCreditCard />
+              <FiHome />
               <span>Home</span>
             </button>
 
@@ -76,7 +76,6 @@ const Dashboard = () => {
                   : 'text-gray-300 hover:text-[#25BA88] transition-colors duration-300'
                 }`}
             >
-              <FiCreditCard />
               <span>Dashboard</span>
             </button>
 
@@ -140,7 +139,7 @@ const Dashboard = () => {
       <div className="flex-1 overflow-auto">
         {/* Tab Navigation */}
           {/* New Header */}
-          <header className="bg-[#070F2B] shadow-sm p-4 sticky top-0 z-10">
+          <header className="bg-[#191E29] shadow-sm p-4 sticky top-0 z-10">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <button 
@@ -189,16 +188,16 @@ const Dashboard = () => {
 
                 <div className="flex items-center"></div>
                 <div 
-                  className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold cursor-pointer"
+                  className="w-12 h-12 rounded-full bg-[#E8AE68] flex items-center justify-center text-white font-semibold cursor-pointer"
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                 >
-                  NS
+                  JB
                 </div>
                 </div>
 
                 <button className="relative text-gray-300 hover:text-white">
                   <FiBell size={20} />
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-white text-xs">
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#E55959] rounded-full flex items-center justify-center text-white text-xs">
                     3
                   </span>
                 </button>
@@ -208,12 +207,12 @@ const Dashboard = () => {
           </header>
 
         {/* Dashboard Content */}
-        <div className="flex flex-col md:flex-row gap-6 w-full">
+        <div className="flex flex-col md:flex-row gap-6 w-full px-8 pt-8">
           {/* Action Cards Section */}
-          <div className="w-full md:w-1/2 bg-white rounded-lg shadow-md p-6">
-            <h4 className='text-black mb-4 font-semibold text-center'>
+          <div className="w-full md:w-1/2 bg-white rounded-lg p-6">
+            <h2 className='text-black mb-4 text-xl font-semibold text-center'>
               What do you want to do?
-            </h4>
+            </h2>
             <hr className="border-t border-gray-200" />
             <div className="flex flex-row gap-5 justify-center items-center mt-4">
               <ActionCard 
@@ -226,17 +225,17 @@ const Dashboard = () => {
               />
               <ActionCard 
                 icon={<FiMoreHorizontal size={35} />} 
-                title="More" 
+                title="More options" 
               />
             </div>
           </div>
 
           {/* Payment Methods Section */}
-          <div className="w-full md:w-1/2 bg-white rounded-lg shadow-md p-6">
+          <div className="w-full md:w-1/2 bg-white rounded-lg p-6">
           <div className="flex justify-between items-center mb-4">
             {/* Using react-icons/ri */}
             <h3 className="text-xl font-semibold text-[#1E1E1E]">Your Payment Methods</h3>
-            <IoAddCircleSharp className="text-[#25BA88] text-3xl" />
+            <IoAddCircleSharp className="text-[#25BA88] cursor-pointer text-3xl" />
           </div>    
           <div className="space-y-4">
               <div className="border-b border-gray-100 pb-4">
@@ -264,12 +263,55 @@ const Dashboard = () => {
           </div>
         </div>        
                
-        <div className="flex flex-col md:flex-row gap-6 w-full mt-6">
-          <div className="w-full md:w-1/2 bg-white rounded-lg shadow-md p-6">
-              <h3 className="mb-3 text-lg font-semibold text-gray-800">Recent Transactions</h3>
-              <div className="space-y-3 rounded-xl bg-white p-4 shadow">
+        <div className="flex flex-col md:flex-row gap-6 w-full mt-6 px-8 pb-8">
+          <div className="w-full md:w-1/2 bg-white rounded-lg p-6">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-semibold text-gray-800">Recent Transactions</h3>
+                  <form className="flex items-center w-80 max-w-md">
+                    <div className="flex w-full">
+                      <label htmlFor="search-bar" className="mb-2 text-sm font-medium text-gray-900 sr-only">
+                        Search Input
+                      </label>
+                      <div className="relative w-full">
+                        <input 
+                          type="search" 
+                          id="search-bar" 
+                          className="block w-full p-2.5 text-sm text-gray-900 bg-white rounded-md border border-gray-300 focus:ring-[#25BA88] focus:border-[#25BA88] focus:outline-none transition-all duration-200" 
+                          placeholder="Search for any transactions" 
+                          required 
+                        />
+                        <button 
+                          type="submit" 
+                          className="absolute top-0 right-0 p-2.5 text-sm font-medium h-full text-gray-500 hover:text-[#25BA88] cursor-pointer focus:ring-4 focus:outline-none focus:ring-[#25BA88]"
+                        >
+                          <svg 
+                            className="w-4 h-4" 
+                            aria-hidden="true" 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            fill="none" 
+                            viewBox="0 0 20 20"
+                          >
+                            <path 
+                              stroke="currentColor" 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round" 
+                              strokeWidth="2" 
+                              d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" 
+                            />
+                          </svg>
+                          <span className="sr-only">Search</span>
+                        </button>
+                      </div>
+                    </div>    
+                  </form>
+                <button className="text-sm text-[#25BA88] bg-white border border-[#25BA88] rounded-md cursor-pointer px-4 py-2">
+                  View All
+                </button>    
+              </div>
+
+              <div className="space-y-3 rounded-xl bg-white p-4">
                 <TransactionItem
-                  title="UGX → USDC(starknet)"
+                  title="UGX → USDC (Starknet)"
                   date="Mar 22, 3:52 PM"
                   items={[
                     { amount: "-367 608 UGX", isNegative: true },
@@ -370,7 +412,7 @@ const TransactionItem = ({
         {items.map((item, index) => (
           <p
             key={index}
-            className={`text-sm ${item.isNegative ? 'text-red-500' : 'text-green-500'}`}
+            className={`text-sm ${item.isNegative ? 'text-[#E55959]' : 'text-[#25BA88]'}`}
           >
             {item.amount}
           </p>
