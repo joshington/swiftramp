@@ -15,7 +15,7 @@
     "bcryptjs": "^3.0.2",
     "beyonic-node": "^0.1.4",
     "mongodb": "^6.14.0",
-    "next": "15.2.0",
+    "next": "15.3.3",
     "next-auth": "^4.24.11",
     "nodemailer": "^6.10.0",
     "react": "^19.0.0",
