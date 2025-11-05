@@ -1,20 +1,19 @@
 import type { Metadata } from "next";
+
 import { SessionProvider } from "next-auth/react";
-import { authOptions } from "./api/auth/route";
+//import { authOptions } from "./api/auth/route";
 import { getServerSession } from "next-auth"
-
-
-
 import Providers from "./Providers";
 
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 //===if i want to share a layout across all pages 
-import Footer from "@/components/Footer";
+//import Footer from "@/components/Footer";
 
-
+import ReduxProvider from "./redux-provider";
 import { StarknetProvider } from "@/components/starknet-provider";
+import { StoreProvider } from "./store/StoreProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,35 +30,18 @@ export const metadata: Metadata = {
   description: "On/Off Ramping",
 };
 
-//export default     function RootLayout({
-//  children,
-//}: Readonly<{
-//  children: React.ReactNode;
-//}>) {
-  //const session = await getServerSession(authOptions);
-//  return (
-//    <html lang="en">
-//      <body
-//        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-//      >
-//        <SessionProvider session={session}>
-//          {children}
-//        </SessionProvider>
-        
-//        <Footer />
-//      </body>
-//    </html>
-//  );
-//}
+
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body>
-        <StarknetProvider>
-          {children}
-        </StarknetProvider>
-      </body>
-    </html>
+    <StoreProvider>
+      <html lang="en">
+        <body>
+          <StarknetProvider>
+            {children}
+          </StarknetProvider>
+        </body>
+      </html>
+    </StoreProvider>
   );
 }

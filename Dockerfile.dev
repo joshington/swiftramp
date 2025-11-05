@@ -1,0 +1,43 @@
+
+#use nodejs 20 as the base image
+FROM node:20 AS base 
+
+#set the working directory
+WORKDIR  /app 
+
+#copy package.json and package-lock.json
+#RUN npm i -g  pnpm 
+COPY package.json package-lock.json ./  
+
+
+#install dependencies using npm
+RUN  npm install  --force
+
+#copy the rest of the application code
+COPY . .
+RUN npm run build 
+#this generates the .next directory
+
+
+#Development stage
+#use node.js 20 alpine as the release image
+FROM node:20-alpine3.19 AS release 
+
+#set the working directory
+WORKDIR  /app 
+#RUN npm i -g pnpm 
+
+
+#Copy node_modules, package.json, and other necessary files from the base image
+COPY --from=base /app/node_modules ./node_modules 
+COPY --from=base /app/package.json  ./package.json
+COPY --from=base /app/.next  ./.next
+COPY --from=base /app/src  ./src
+COPY --from=base  /app  .
+
+
+#Expose port 3000
+EXPOSE 3000 
+
+#start the application using npm
+CMD [ "npm","run", "dev" ]

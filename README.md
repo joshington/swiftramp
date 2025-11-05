@@ -1,36 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
 
-First, run the development server:
+## =====azure dev  instructions =====
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## create new branch from within azure
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## clone the repo from azure and aswell take not of your git credentials coz you will use 
+## them when pushing your commit
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ===to ease development and configure 
+## kindly use the Dockerfile.dev file in the master branch that i added 
+## == run this docker command to install everything in development
+##  1 - Build the docker image; =>  docker build -f Dockerfile.dev -t swiftramp:dev .
+##      -f Dockerfile.dev: Specifies the Dockerfile to use (in this case, Dockerfile.dev).
 
-## Learn More
+##      -t swiftramp:dev: Tags the image with a name (my-nextjs-app) and a tag (dev).
 
-To learn more about Next.js, take a look at the following resources:
+##      .: The build context (current directory).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+##   2  - Run the Docker Container  => docker run -p 3000:3000 swiftramp:dev
+##         -p 3000:3000: Maps port 3000 on your local machine to port 3000 in the container (as specified by ##         EXPOSE 3000 in your Dockerfile).
+##      -  swiftramp:dev - the name and tag of the image you built
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+##   3   - Access the Application
+##         After running the container, your Next.js development server should start, and you can access the ##         application in your browser at:
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
