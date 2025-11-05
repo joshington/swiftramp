@@ -1,4 +1,3 @@
-
 name: Sync from Azure DevOps
 
 on:
@@ -17,6 +16,7 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0  # Fetch all history
+        ref: master  # Add this to specify the master branch
 
     - name: Configure git
       run: |
@@ -30,9 +30,12 @@ jobs:
 
     - name: Merge changes from Azure DevOps
       run: |
-        # Merge Azure DevOps main branch into GitHub main branch
-        git merge azure-devops/main --allow-unrelated-histories --no-edit
+        # Merge Azure DevOps master branch into GitHub master branch
+        git merge azure-devops/master --allow-unrelated-histories --no-edit
+        
+        # Or if you prefer rebase:
+        # git rebase azure-devops/master
 
     - name: Push changes to GitHub
       run: |
-        git push origin main
+        git push origin master
