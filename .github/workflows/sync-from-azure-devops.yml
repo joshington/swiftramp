@@ -1,1 +1,38 @@
 
+name: Sync from Azure DevOps
+
+on:
+  schedule:
+    # Run every 15 minutes
+    - cron: '*/15 * * * *'
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  sync-repo:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout GitHub repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0  # Fetch all history
+
+    - name: Configure git
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+
+    - name: Add Azure DevOps remote
+      run: |
+        git remote add azure-devops ${{ secrets.AZURE_DEVOPS_REPO_URL }}
+        git fetch azure-devops
+
+    - name: Merge changes from Azure DevOps
+      run: |
+        # Merge Azure DevOps main branch into GitHub main branch
+        git merge azure-devops/main --allow-unrelated-histories --no-edit
+
+    - name: Push changes to GitHub
+      run: |
+        git push origin main
